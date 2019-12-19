@@ -1,7 +1,7 @@
 # Warnable
 Simple Discord bot to moderate and create rules to manage Discord servers.
 
-## Features
+### Features
 - Warn System
 - Automatic Kick/Ban rules
 - Auto warns
