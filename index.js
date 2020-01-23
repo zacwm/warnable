@@ -3,6 +3,7 @@
 
 const Discord = require("discord.js");
 const jsonDB = require("node-json-db");
+var CRC16 = require('crc16');
 const client = new Discord.Client();
 const botDB = new jsonDB("botData", true, true);
 const config = require("./config.json");
@@ -12,9 +13,7 @@ client.login(config.token);
 // Bot Listening
 client.on("ready", () => {
     console.log(`${client.user.username} is now ready!`);
-    if (client.guilds.size > 1) {
-        console.warn("!!! WARNING !!! Warnable is not supported for more than one Discord server.\nWarnings do NOT save for each server, all warnings sync across servers for users.\nThis may be supported in the future, but do not make an issue if you are using it in more than one server please :(");
-    }
+    if (client.guilds.size > 1) console.warn("!!! WARNING !!! Warnable is not supported for more than one Discord server.\nWarnings do NOT save for each server, all warnings sync across servers for users.\nThis may be supported in the future, but do not make an issue if you are using it in more than one server please :("); 
 });
 
 //- Commands
@@ -24,7 +23,9 @@ const commands = {
             if (msg.mentions.members.first()) {
                 var warningUser = msg.mentions.members.first().id;
                 var warningReason = msg.content.replace("!warn <@" + warningUser + "> " , "").split(" ")[2];
-                warningAdd(warningUser, warningReason, msg.author);
+                warningAdd(warningUser, warningReason, msg.author, function(res) {
+                    msg.channel.send(res);
+                });
             }
             else {
                 msg.reply("The mention is invalid.");
@@ -36,10 +37,12 @@ const commands = {
                 var warningUser = findUsernameUser(warningUsername);
                 if (warningUser) {
                     var warningReason = msg.content.replace('!warn "' + warningUsername + '" ', "");
-                    warningAdd(warningUser, warningReason, msg.author);
+                    warningAdd(warningUser, warningReason, msg.author, function(res) {
+                        msg.channel.send(res);
+                    });
                 } 
                 else {
-                    msg.send("Unable to find user.");
+                    msg.reply("Unable to find user.");
                 }
             }
         }
@@ -84,12 +87,26 @@ client.on("message", msg => {
 });
 
 // Warning Functions
-function warningAdd(uid, reason, issuer) {
-
+function warningAdd(uid, reason, issuer, callback) {
+    var warningID = (dbRequest("/warnings") !== undefined) ? CRC16((Object.keys(dbRequest("/warnings")).length + 1).toString()) : CRC16("1");
+    botDB.push("/warnings/" + warningID, { user: uid, reason: reason, issuer: issuer.id, time: new Date() });
+    if (dbRequest("/users/" + uid) !== undefined) {
+        var warnings = dbRequest("/users/" + uid);
+        warnings.push(warningID);
+        botDB.push("/users/" + uid, warnings);
+    }
+    else {
+        botDB.push("/users/" + uid, [warningID]);
+    }
+    callback("Warning has been added to <@" + uid + ">");
 }
 
 function warningRemove(wid, callback) {
     
+}
+
+function warningCheck(uid) {
+
 }
 
 // Additional Functions
@@ -100,4 +117,9 @@ function extractUsername(str){
 
 function findUsernameUser(username) {
     
+}
+
+function dbRequest(path) {
+    try { return botDB.getData(path); }
+    catch (err) { return undefined; }
 }
