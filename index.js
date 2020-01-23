@@ -7,7 +7,7 @@ const client = new Discord.Client();
 const botDB = new jsonDB("botData", true, true);
 const config = require("./config.json");
 
-client.login(config.properties);
+client.login(config.token);
 
 // Bot Listening
 client.on("ready", () => {
@@ -20,30 +20,38 @@ client.on("ready", () => {
 //- Commands
 const commands = {
     "warn": (msg) => {
-        if (msg.mentions.users) {
-            var warningUser = msg.mentions.users.first.id;
-            var warningReason = msg.content.replace(/[|&;$%@"<>()+,] /g , "").split(" ")[2];
-            warningAdd(warningUser, warningReason, msg.author);
+        if (msg.content.split(" ")[1].startsWith("<")) {
+            if (msg.mentions.members.first()) {
+                var warningUser = msg.mentions.members.first().id;
+                var warningReason = msg.content.replace("!warn <@" + warningUser + "> " , "").split(" ")[2];
+                warningAdd(warningUser, warningReason, msg.author);
+            }
+            else {
+                msg.reply("The mention is invalid.");
+            }
         }
-        else {
+        else if (msg.content.split(" ")[1].startsWith('"')) {
             var warningUsername = extractUsername(msg.content);
             if (warningUsername.match(/.*#\d{4}\b/g)) {
                 var warningUser = findUsernameUser(warningUsername);
                 if (warningUser) {
-                    var warningReason = msg.content.replace('"' + warningUsername + '" ', "");
+                    var warningReason = msg.content.replace('!warn "' + warningUsername + '" ', "");
                     warningAdd(warningUser, warningReason, msg.author);
                 } 
                 else {
-                    msg.channel.send("Unable to find user.");
+                    msg.send("Unable to find user.");
                 }
             }
+        }
+        else {
+            msg.reply("Command used incorrectly.");
         }
     },
     "remove": (msg) => {
         var warnID = msg.content.split(" ")[1]
         if (warnID) {
             warningRemove(warnID, function(res) {
-                msg.channel.reply()
+                msg.reply(res);
             });
         }
         else {
@@ -65,11 +73,11 @@ client.on("message", msg => {
     if (msg.guild) {
         if (!msg.content.startsWith(config.prefix)) return;
         if (commands.hasOwnProperty(msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0])) {
-            if (config.admin.roles.some(r=> msg.member.roles.array.indexOf(r) >= 0) || config.admin.users.includes(msg.author.id)) {
+            if (config.admins.roles.some(r=> msg.member.roles.array.indexOf(r) >= 0) || config.admins.users.includes(msg.author.id)) {
                 commands[msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0]](msg);
             }
             else {
-                msg.channel.send("You don't have permission to use this command.");
+                msg.channel.reply("You don't have permission to use this command.");
             }
         }
     }
@@ -77,7 +85,7 @@ client.on("message", msg => {
 
 // Warning Functions
 function warningAdd(uid, reason, issuer) {
-    
+
 }
 
 function warningRemove(wid, callback) {
@@ -91,5 +99,5 @@ function extractUsername(str){
 }
 
 function findUsernameUser(username) {
-
+    
 }
