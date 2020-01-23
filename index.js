@@ -2,10 +2,11 @@
 // Version 1.0.0 - By www.zachary.fun
 
 const Discord = require("discord.js");
+const jsonDB = require('node-json-db');
 const client = new Discord.Client();
 const jsonDB = new jsonDB("botData", true, true);
 
-client.login(config.properties)
+client.login(config.properties);
 
 // Bot Listening
 client.on("ready", () => {
@@ -50,6 +51,20 @@ const commands = {
 
     }
 };
+
+client.on("message", msg => {
+    if (msg.guild) {
+        if (!msg.content.startsWith(config.prefix)) return;
+        if (commands.hasOwnProperty(msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0])) {
+            if (config.admin.roles.some(r=> msg.member.roles.array.indexOf(r) >= 0) || config.admin.users.includes(msg.author.id)) {
+                commands[msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0]](msg);
+            }
+            else {
+                msg.channel.send("You don't have permission to use this command.");
+            }
+        }
+    }
+});
 
 // Warning Functions
 function warningAdd(uid, reason, issuer) {

@@ -1,0 +1,16 @@
+{
+    "name": "warnable",
+    "version": "1.0.0",
+    "description": "Open Source Discord bot for warnings",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "author": "www.zachary.fun",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "^11.5.1",
+        "node-json-db": "0.10.0"
+    }
+}
+  
