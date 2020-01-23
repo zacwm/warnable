@@ -2,9 +2,10 @@
 // Version 1.0.0 - By www.zachary.fun
 
 const Discord = require("discord.js");
-const jsonDB = require('node-json-db');
+const jsonDB = require("node-json-db");
 const client = new Discord.Client();
-const jsonDB = new jsonDB("botData", true, true);
+const botDB = new jsonDB("botData", true, true);
+const config = require("./config.json");
 
 client.login(config.properties);
 
@@ -39,7 +40,15 @@ const commands = {
         }
     },
     "remove": (msg) => {
-
+        var warnID = msg.content.split(" ")[1]
+        if (warnID) {
+            warningRemove(warnID, function(res) {
+                msg.channel.reply()
+            });
+        }
+        else {
+            msg.channel.send("A warning ID must be specified.");
+        }
     },
     "list": (msg) => {
 
@@ -48,7 +57,7 @@ const commands = {
 
     },
     "settings": (msg) => {
-
+        var msgArg = msg.content.toLowerCase().split(" ");
     }
 };
 
@@ -68,11 +77,11 @@ client.on("message", msg => {
 
 // Warning Functions
 function warningAdd(uid, reason, issuer) {
-
+    
 }
 
-function warningRemove(wid) {
-
+function warningRemove(wid, callback) {
+    
 }
 
 // Additional Functions
