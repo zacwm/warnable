@@ -3,7 +3,6 @@
 
 const Discord = require("discord.js");
 const jsonDB = require("node-json-db");
-var CRC16 = require('crc16');
 const client = new Discord.Client();
 const botDB = new jsonDB("botData", true, true);
 const config = require("./config.json");
@@ -88,7 +87,7 @@ client.on("message", msg => {
 
 // Warning Functions
 function warningAdd(uid, reason, issuer, callback) {
-    var warningID = (dbRequest("/warnings") !== undefined) ? CRC16((Object.keys(dbRequest("/warnings")).length + 1).toString()) : CRC16("1");
+    var warningID = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
     botDB.push("/warnings/" + warningID, { user: uid, reason: reason, issuer: issuer.id, time: new Date() });
     if (dbRequest("/users/" + uid) !== undefined) {
         var warnings = dbRequest("/users/" + uid);
