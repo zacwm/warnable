@@ -3,7 +3,5 @@ Warnable is a bot to be easy for any Discord server admin to be able to setup an
 
 ### Features
 - Warn System
-- Automatic Kick/Ban rules
-- Auto warns
-- Customizable
-- Many commands to help out
+- Simple warning commands
+- Easy to edit
