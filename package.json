@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/zacimac/warnable#readme",
   "dependencies": {
+    "bad-words": "^3.0.3",
     "discord.js": "^11.5.1",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",

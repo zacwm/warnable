@@ -4,6 +4,8 @@
 const Discord = require("discord.js");
 const jsonDB = require("node-json-db");
 const moment = require('moment-timezone');
+const Filter = require('bad-words');
+const badWords = new Filter();
 const client = new Discord.Client();
 const botDB = new jsonDB("botData", true, true);
 const config = require("./config.json");
@@ -22,7 +24,7 @@ const commands = {
             if (msg.mentions.members.first()) {
                 var warningUser = msg.mentions.members.first().id;
                 var warningReason = msg.content.replace(/<[@#][!&]?[0-9]+>/g, "").substring(config.prefix.length + 6);
-                warningAdd(warningUser, warningReason, msg.author, function(res) {
+                warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
                     msg.channel.send(res);
                 });
             }
@@ -36,7 +38,7 @@ const commands = {
                 var warningUser = findUsernameUser(warningUsername);
                 if (warningUser) {
                     var warningReason = msg.content.replace('!warn "' + warningUsername + '" ', "");
-                    warningAdd(warningUser, warningReason, msg.author, function(res) {
+                    warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
                         msg.channel.send(res);
                     });
                 } 
@@ -134,12 +136,6 @@ const commands = {
         else {
             msg.reply("Command used incorrectly.");
         }
-    },
-    "info": (msg) => {
-
-    },
-    "settings": (msg) => {
-        var msgArg = msg.content.toLowerCase().split(" ");
     }
 };
 
@@ -147,7 +143,7 @@ client.on("message", msg => {
     if (msg.guild) {
         if (msg.content.startsWith(config.prefix)) {
             if (commands.hasOwnProperty(msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0])) {
-                if (config.admins.roles.some(r=> msg.member.roles.array.indexOf(r) >= 0) || config.admins.users.includes(msg.author.id)) {
+                if (config.admins.roles.some(r=> msg.member.roles.array().indexOf(r) >= 0) || config.admins.users.includes(msg.author.id)) {
                     commands[msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0]](msg);
                 }
                 else {
@@ -155,23 +151,81 @@ client.on("message", msg => {
                 }
             }
         }
+        // Rules
+        if (!msg.author.bot && msg.guild.id == config.channels.guild) {
+            if (!config.channels.ignore.includes(msg.channel.id)) {
+                if (msg.content.match(/(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+[a-z]/gm)) {
+                    if (config.automation.discordInvites.deleteMessage) msg.delete();
+                    if (config.automation.discordInvites.giveWarning) warningAdd(msg.author.id, "Automatic: Discord Invite", client.user, msg.guild, function() {});
+                }
+                else if (badWords.isProfane(msg.content)) {
+                    if (config.automation.swearing.deleteMessage) msg.delete();
+                    if (config.automation.swearing.giveWarning) warningAdd(msg.author.id, "Automatic: Swearing", client.user, msg.guild, function() {});
+                }
+                else if (msg.content.match(/^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/gm)) {
+                    if (config.automation.externalLinks.deleteMessage) msg.delete();
+                    if (config.automation.externalLinks.giveWarning) warningAdd(msg.author.id, "Automatic: Links", client.user, msg.guild, function() {});
+                }
+            }
+        }
     }
 });
 
 // Warning Functions
-function warningAdd(uid, reason, issuer, callback) {
-    var warningID = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
-    botDB.push("/warnings/" + warningID, { user: uid, reason: reason, issuer: issuer.id, time: new Date() });
-    if (dbRequest("/users/" + uid) !== undefined) {
-        var warnings = dbRequest("/users/" + uid);
-        warnings.push(warningID);
-        botDB.push("/users/" + uid, warnings);
+function warningAdd(uid, reason, issuer, guild, callback) {
+    try {
+        if (config.admins.users.includes(uid) || config.admins.roles.some(r=> guild.members.get(uid).roles.array().indexOf(r) >= 0) || guild.members.get(uid).roles.get(config.roles.immuneRole)) {
+            callback("This user is unable to be warned due to immunity.");
+        }
+        else {
+            var warningID = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
+            botDB.push("/warnings/" + warningID, { user: uid, reason: reason, issuer: issuer.id, time: new Date() });
+            var totalWarnings;
+            if (dbRequest("/users/" + uid) !== undefined) {
+                var warnings = dbRequest("/users/" + uid);
+                warnings.push(warningID);
+                botDB.push("/users/" + uid, warnings);
+                totalWarnings = warnings.length.toString();
+            }
+            else {
+                botDB.push("/users/" + uid, [warningID]);
+                totalWarnings = "1";
+            }
+            warningCheck(uid, guild);
+            callback("Warning has been added to <@" + uid + ">\nWarning ID: ``" + warningID + "``");
+            var warnLogChannel = client.guilds.get(config.channels.guild).channels.get(config.channels.log.warnings);
+            if (warnLogChannel.permissionsFor(client.user.id).has("EMBED_LINKS")) {
+                warnLogChannel.send("", {embed: {
+                    color: 0x9b59b6,
+                    title: "New warning",
+                    description: "<@" + uid + "> was warned for:\n```" + reason + "```",
+                    fields: [
+                        {
+                            name: "Issuer",
+                            value: "<@" + issuer.id + ">",
+                            inline: true
+                        },
+                        {
+                            name: "Time",
+                            value: moment().tz("UTC").format("MMM Do YY, h:mm:ss a") + " (UTC)",
+                            inline: true
+                        },
+                        {
+                            name: "Total warns",
+                            value: totalWarnings,
+                            inline: true
+                        }
+                    ]
+                }});
+            }
+            else {
+                warnLogChannel.send("**__New warning__**\nUser warned: <@" + uid + ">\nReason: `" + reason + "`\nIssuer: <@" + issuer.id + "> | Time: " + moment().tz("UTC").format("MMM Do YY, h:mm:ss a") + " (UTC) | Total warns: " + totalWarnings);
+            }
+        }
     }
-    else {
-        botDB.push("/users/" + uid, [warningID]);
+    catch (err) {
+        console.log(err);
     }
-    warningCheck(uid);
-    callback("Warning has been added to <@" + uid + ">\nWarning ID: ``" + warningID + "``");
 }
 
 function warningRemove(wid, callback) {
@@ -194,8 +248,34 @@ function warningRemove(wid, callback) {
     }
 }
 
-function warningCheck(uid) {
-
+function warningCheck(uid, guild) {
+    var userWarns = dbRequest("/users/" + uid);
+    try {
+        if (userWarns !== undefined) {
+            var warnedUser = guild.members.get(uid);
+            if (userWarns.length == config.rules.RmuteAfter) {
+                warnedUser.addRole(config.roles.muteRole)
+                .then(function() {
+                    client.guilds.get(config.channels.guild).channels.get(config.channels.log.alerts).send(`:boot: The user <@${warnedUser.id}> (${warnedUser.user.username}#${warnedUser.user.discriminator}) has had the mute role added to them for reaching **${config.rules.RmuteAfter}** warnings.`);
+                });
+            }
+            if (userWarns.length == config.rules.kickAfter) {
+                warnedUser.kick(`User has reached ${config.rules.kickAfter} warnings`)
+                .then(function() {
+                    client.guilds.get(config.channels.guild).channels.get(config.channels.log.alerts).send(`:boot: The user <@${warnedUser.id}> (${warnedUser.user.username}#${warnedUser.user.discriminator}) has been kicked from the server for raching **${config.rules.kickAfter}** warnings.`);
+                });
+            }
+            if (userWarns.length == config.rules.banAfter) {
+                warnedUser.ban({reason: `User has reached ${config.rules.banAfter} warnings`})
+                .then(function() {
+                    client.guilds.get(config.channels.guild).channels.get(config.channels.log.alerts).send(`:hammer: The user <@${warnedUser.id}> (${warnedUser.user.username}#${warnedUser.user.discriminator}) has been banned from the server for raching **${config.rules.banAfter}** warnings.`);
+                });
+            }
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
 }
 
 // Additional Functions
