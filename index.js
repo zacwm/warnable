@@ -6,7 +6,6 @@ const jsonDB = require("node-json-db");
 const client = new Discord.Client();
 const botDB = new jsonDB("botData", true, true);
 const config = require("./config.json");
-
 client.login(config.token);
 
 // Bot Listening
@@ -21,7 +20,7 @@ const commands = {
         if (msg.content.split(" ")[1].startsWith("<")) {
             if (msg.mentions.members.first()) {
                 var warningUser = msg.mentions.members.first().id;
-                var warningReason = msg.content.replace("!warn <@" + warningUser + "> " , "").split(" ")[2];
+                var warningReason = msg.content.replace("!warn <@" + warningUser + "> " , "");
                 warningAdd(warningUser, warningReason, msg.author, function(res) {
                     msg.channel.send(res);
                 });
