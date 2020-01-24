@@ -1,0 +1,50 @@
+{
+    "token": "",
+    "prefix": "!",
+    "admins": {
+        "!_Info": "Admins must be set to be able to use the bot",
+        "._Info": "A single user can be added by entering the user ID into 'users', or an entire group can be added by entering in a guild role ID",
+        "*_Info": "Admins will be immune to any warnings.",
+        "users": [],
+        "roles": []
+    },
+    "channels": {
+        "*_Info": "Channels are highly recommended to be set. The ignore channels array will only ignore channels for automation, manual warnings will still work.",
+        "guild": "",
+        "log": {
+            "warnings": "",
+            "alerts": ""
+        },
+        "ignore": []
+    },
+    "roles": {
+        "!_Info": "Roles are required if a rule has a letter 'R' at the start. (example: 'RmuteAfter')",
+        "._Info": "If a role is invalid or not specified, the rule will be ignored.",
+        "*_Info": "Roles must be the ID of a role. ID of roles can found like this: https://zachary.fun/i/XGrAK.png",
+        "muteRole": "",
+        "immuneRole": ""
+    },
+    "rules": {
+        "!_Info": "Each number is the amount of warns until it performs the action.",
+        "._Info": "To disable/ignore a rule, set it to a warning level of 0.",
+        "RmuteAfter": 2,
+        "kickAfter": 5,
+        "banAfter": 7
+    },
+    "automation": {
+        "!_Info": "Automation is settings to determine what to automatically warn users.",
+        "._Info": "Each setting must bet set to either 'true' or 'false'.",
+        "discordInvites": {
+            "deleteMessage": true,
+            "giveWarning": true
+        },
+        "swearing": {
+            "deleteMessage": true,
+            "giveWarning": true
+        },
+        "externalLinks": {
+            "deleteMessage": false,
+            "giveWarning": false
+        }
+    }
+}
