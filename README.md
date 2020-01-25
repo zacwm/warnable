@@ -6,6 +6,23 @@ Warnable is a bot to be easy for any Discord server admin to be able to setup an
 - Simple warning commands
 - Easy to edit
 
+### Commands
+The commands are pretty simple. Any new warnings will be saved under a 'warning ID'. Warning ID's can be used to remove warnings from users and probbaly more stuff as I keep updating this.
+Commands can only be accessed if the user ID is added or a guild role is added in the 'config.json'.
+Note: All commands must start with the prefix that is set in 'config.json'.
+
+#### `warn {user} {reason}`
+The warn command will add a warning to the user along with the reason.
+The `{user}` can either be a mentioned user **OR** the username and discriminator surrounded by double quotes (e.g: "Zachary#0001")
+
+#### `remove {warning ID}`
+The remove command will delete the warning from the user and in the database.
+Warning ID's can be found after warning a user or listing warnings for a user with the 'list' command
+
+#### `list {user}`
+The list command will list all warnings that a user has recieved. (As a heads up, I plan on introducing pages for the lists in the future, so it won't encounter any character limits for lots of warnings)
+The `{user}` can either be a mentioned user **OR** the username and discriminator surrounded by double quotes (e.g: "Zachary#0001")
+
 ### Setup
 Note: You can find most ID's by making sure you have developer mode enabled in your Discord settings and then doing [this](https://zachary.fun/i/ITp6y.png)
 1. Rename "config.templete.json" to "config.json"
