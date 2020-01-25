@@ -37,7 +37,7 @@ const commands = {
             if (warningUsername.match(/.*#\d{4}\b/g)) {
                 var warningUser = findUsernameUser(warningUsername);
                 if (warningUser) {
-                    var warningReason = msg.content.replace('!warn "' + warningUsername + '" ', "");
+                    var warningReason = msg.content.replace(config.prefix + 'warn "' + warningUsername + '" ', "");
                     warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
                         msg.channel.send(res);
                     });
@@ -143,7 +143,7 @@ client.on("message", msg => {
     if (msg.guild) {
         if (msg.content.startsWith(config.prefix)) {
             if (commands.hasOwnProperty(msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0])) {
-                if (config.admins.roles.some(r=> msg.member.roles.array().indexOf(r) >= 0) || config.admins.users.includes(msg.author.id)) {
+                if (msg.member.roles.array().some(r => config.admins.roles.indexOf(r.id) >= 0) || config.admins.users.includes(msg.author.id)) {
                     commands[msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0]](msg);
                 }
                 else {
@@ -174,7 +174,7 @@ client.on("message", msg => {
 // Warning Functions
 function warningAdd(uid, reason, issuer, guild, callback) {
     try {
-        if (config.admins.users.includes(uid) || config.admins.roles.some(r=> guild.members.get(uid).roles.array().indexOf(r) >= 0) || guild.members.get(uid).roles.get(config.roles.immuneRole)) {
+        if (config.admins.users.includes(uid) || guild.members.get(uid).roles.array().some(r => config.admins.roles.indexOf(r.id) >= 0) || guild.members.get(uid).roles.get(config.roles.immuneRole)) {
             callback("This user is unable to be warned due to immunity.");
         }
         else {
