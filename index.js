@@ -24,9 +24,14 @@ const commands = {
             if (msg.mentions.members.first()) {
                 var warningUser = msg.mentions.members.first().id;
                 var warningReason = msg.content.replace(/<[@#][!&]?[0-9]+>/g, "").substring(config.prefix.length + 6);
-                warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
-                    msg.channel.send(res);
-                });
+                if (warningReason !== "") {
+                    warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
+                        msg.channel.send(res);
+                    });
+                }
+                else {
+                    msg.reply("A reason must be included.");
+                }
             }
             else {
                 msg.reply("The mention is invalid.");
@@ -38,9 +43,14 @@ const commands = {
                 var warningUser = findUsernameUser(warningUsername);
                 if (warningUser) {
                     var warningReason = msg.content.replace(config.prefix + 'warn "' + warningUsername + '" ', "");
-                    warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
-                        msg.channel.send(res);
-                    });
+                    if (warningReason !== "") {
+                        warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
+                            msg.channel.send(res);
+                        });
+                    }
+                    else {
+                        msg.reply("A reason must be included.");
+                    }
                 } 
                 else {
                     msg.reply("Unable to find user.");
