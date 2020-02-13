@@ -207,7 +207,7 @@ function warningAdd(uid, reason, issuer, guild, callback) {
             if (warnLogChannel.permissionsFor(client.user.id).has("EMBED_LINKS")) {
                 warnLogChannel.send("", {embed: {
                     color: 0x9b59b6,
-                    title: "New warning",
+                    title: "New warning (" + warningID + ")",
                     description: "<@" + uid + "> was warned for:\n```" + reason + "```",
                     fields: [
                         {
@@ -229,7 +229,7 @@ function warningAdd(uid, reason, issuer, guild, callback) {
                 }});
             }
             else {
-                warnLogChannel.send("**__New warning__**\nUser warned: <@" + uid + ">\nReason: `" + reason + "`\nIssuer: <@" + issuer.id + "> | Time: " + moment().tz("UTC").format("MMM Do YY, h:mm:ss a") + " (UTC) | Total warns: " + totalWarnings);
+                warnLogChannel.send("**__New warning (" + warningID + ")__**\nUser warned: <@" + uid + ">\nReason: `" + reason + "`\nIssuer: <@" + issuer.id + "> | Time: " + moment().tz("UTC").format("MMM Do YY, h:mm:ss a") + " (UTC) | Total warns: " + totalWarnings);
             }
         }
     }
