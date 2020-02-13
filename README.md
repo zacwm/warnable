@@ -1,4 +1,5 @@
 # Warnable
+[![Build Status](https://travis-ci.org/zacimac/warnable.svg?branch=master)](https://travis-ci.org/zacimac/warnable)
 Warnable is a bot to be easy for any Discord server admin to be able to setup and use on their own system.
 
 ### Features
