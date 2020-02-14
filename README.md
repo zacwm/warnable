@@ -1,7 +1,7 @@
 # Warnable
 [![Build Status](https://travis-ci.org/zacimac/warnable.svg?branch=master)](https://travis-ci.org/zacimac/warnable)
-[![star this repo](https://githubbadges.com/star.svg?user=zacimac&repo=warnable&style=default)](https://github.com/zacimac/warnable)
-[![fork this repo](https://githubbadges.com/fork.svg?user=zacimac&repo=warnable&style=default)](https://github.com/zacimac/warnable/fork)
+[![star this repo](https://githubbadges.com/star.svg?user=zacimac&repo=warnable&style=flat)](https://github.com/zacimac/warnable)
+[![fork this repo](https://githubbadges.com/fork.svg?user=zacimac&repo=warnable&style=flat)](https://github.com/zacimac/warnable/fork)
 
 Warnable is a bot to be easy for any Discord server admin to be able to setup and use on their own system.
 
