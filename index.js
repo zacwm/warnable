@@ -8,7 +8,7 @@ const Filter = require('bad-words');
 const badWords = new Filter();
 const client = new Discord.Client();
 const botDB = new jsonDB("botData", true, true);
-const config = require("./config.json");
+const config = require("./config.json").JsonDB;
 client.login(config.token);
 
 // Bot Listening
