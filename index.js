@@ -2,12 +2,12 @@
 // Version 1.0.0 - By www.zachary.fun
 
 const Discord = require("discord.js");
-const jsonDB = require("node-json-db");
+const jsonDB = require("node-json-db").JsonDB;
 const moment = require('moment-timezone');
 const Filter = require('bad-words');
 const badWords = new Filter();
 const client = new Discord.Client();
-const botDB = new jsonDB("botData", true, true).JsonDB;
+const botDB = new jsonDB("botData", true, true);
 const config = require("./config.json");
 client.login(config.token);
 
