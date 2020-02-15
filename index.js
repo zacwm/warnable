@@ -7,8 +7,8 @@ const moment = require('moment-timezone');
 const Filter = require('bad-words');
 const badWords = new Filter();
 const client = new Discord.Client();
-const botDB = new jsonDB("botData", true, true);
-const config = require("./config.json").JsonDB;
+const botDB = new jsonDB("botData", true, true).JsonDB;
+const config = require("./config.json");
 client.login(config.token);
 
 // Bot Listening
