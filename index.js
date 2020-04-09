@@ -165,7 +165,6 @@ client.on("message", msg => {
         if (!msg.author.bot && msg.guild.id == config.channels.guild) {
             if (!config.channels.ignore.includes(msg.channel.id)) {
                 if (msg.content.match(/(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+[a-z]/gm)) {
-                    console.log("WOW, dont do that!")
                     if (config.automation.discordInvites.deleteMessage) {
                         msg.delete();
                         msg.channel.send("", {embed: {
