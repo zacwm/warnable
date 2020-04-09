@@ -165,7 +165,13 @@ client.on("message", msg => {
         if (!msg.author.bot && msg.guild.id == config.channels.guild) {
             if (!config.channels.ignore.includes(msg.channel.id)) {
                 if (msg.content.match(/(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+[a-z]/gm)) {
-                    if (config.automation.discordInvites.deleteMessage) msg.delete();
+                    if (config.automation.discordInvites.deleteMessage) {
+                        msg.delete();
+                        msg.channel.send("", {embed: {
+                            color: 0x9b59b6,
+                            title: `${msg.author.username}, you are not allowed to send Discord invite links in this server.`
+                        }});
+                    } 
                     if (config.automation.discordInvites.giveWarning) warningAdd(msg.author.id, "Automatic: Discord Invite", client.user, msg.guild, function() {});
                 }
                 else if (badWords.isProfane(msg.content)) {
