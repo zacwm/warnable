@@ -21,7 +21,7 @@ client.on("ready", () => {
 const commands = {
     "warn": (msg) => {
         if (msg.content.split(" ")[1].match(/^(<[@][!]?)?([0-9]+)(>)?/g)) {
-            let warningUser = msg.content.split(" ")[1].match(/^(<[@][!]?)?([0-9]+)(>)?/g)[0]
+            let warningUser = (/^(<[@][!]?)?([0-9]+)(>)?/g).exec(msg.content.split(" ")[1])[2] 
             var warningReason = msg.content.split(" ") // Use var cause we're gonna redefine this later
             warningReason.shift() // Remove the first two items from array. This is hacky but gets the job done considering there is no command library
             warningReason.shift() // .shift() returns the removed value and returns the original array, which is why we can't just .shift().shift()
@@ -70,40 +70,37 @@ const commands = {
         }
     },
     "list": (msg) => {
-        if (msg.content.split(" ")[1].startsWith("<")) {
-            if (msg.mentions.members.first()) {
-                var warningUser = msg.mentions.members.first();
-                var warnList = dbRequest("/users/" + warningUser.id);
-                if (warnList !== undefined) {
-                    var warnEmbed = [];
-                    var warnText = "";
-                    for (i=0; i < warnList.length; i++) {
-                        var warnInfo = dbRequest("/warnings/" + warnList[i]);
-                        if (warnInfo) {
-                            warnEmbed.push({ name: `Warning '${warnList[i]}'`, value: `By: <@${warnInfo.issuer}> | Time: ${moment(warnInfo.time).tz("UTC").format("MMM Do YY, h:mm:ss a")} (UTC)\nReason: '${warnInfo.reason}'`});
-                            warnText = warnText + `\n**- Warning '${warnList[i]}**'\nBy: <@${warnInfo.issuer}> | Time: ${moment(warnInfo.time).tz("UTC").format("MMM Do YY, h:mm:ss a")} (UTC)\nReason: '${warnInfo.reason}'`;
-                        }
-                        if (warnList.length == i + 1) { 
-                            if (msg.channel.permissionsFor(client.user.id).has("EMBED_LINKS")) {
-                                msg.channel.send("", {embed: {
+        if (msg.content.split(" ")[1].match(/^(<[@][!]?)?([0-9]+)(>)?/g)) {
+            let warningUser = (/^(<[@][!]?)?([0-9]+)(>)?/g).exec(msg.content.split(" ")[1])[2] 
+            var warnList = dbRequest("/users/" + warningUser);
+            if (warnList !== undefined) {
+                var warnEmbed = [];
+                var warnText = "";
+                for (i = 0; i < warnList.length; i++) {
+                    var warnInfo = dbRequest("/warnings/" + warnList[i]);
+                    if (warnInfo) {
+                        warnEmbed.push({ name: `Warning '${warnList[i]}'`, value: `By: <@${warnInfo.issuer}> | Time: ${moment(warnInfo.time).tz("UTC").format("MMM Do YY, h:mm:ss a")} (UTC)\nReason: '${warnInfo.reason}'` });
+                        warnText = warnText + `\n**- Warning '${warnList[i]}**'\nBy: <@${warnInfo.issuer}> | Time: ${moment(warnInfo.time).tz("UTC").format("MMM Do YY, h:mm:ss a")} (UTC)\nReason: '${warnInfo.reason}'`;
+                    }
+                    if (warnList.length == i + 1) {
+                        if (msg.channel.permissionsFor(client.user.id).has("EMBED_LINKS")) {
+                            msg.channel.send("", {
+                                embed: {
                                     color: 0x9b59b6,
                                     title: "List warnings",
                                     description: "Listing warnings for " + warningUser,
                                     fields: warnEmbed
-                                }});
-                            }
-                            else {
-                                msg.channel.send(`**__Listing warnings for ${warningUser}__**${warnText}`);
-                            }
+                                }
+                            });
+                        }
+                        else {
+                            msg.channel.send(`**__Listing warnings for ${warningUser}__**${warnText}`);
                         }
                     }
                 }
-                else {
-                    msg.reply("User has no warnings.");
-                }
             }
             else {
-                msg.reply("The mention is invalid.");
+                msg.reply("User has no warnings.");
             }
         }
         else if (msg.content.split(" ")[1].startsWith('"')) {
@@ -187,7 +184,7 @@ client.on("message", msg => {
 // Warning Functions
 function warningAdd(uid, reason, issuer, guild, callback) {
     try {
-        if (config.admins.users.includes(uid) || guild.members.get(uid).roles.array().some(r => config.admins.roles.indexOf(r.id) >= 0) || guild.members.get(uid).roles.get(config.roles.immuneRole)) {
+        if (guild.members.get(uid) !== undefined && (config.admins.users.includes(uid)  || guild.members.get(uid).roles.array().some(r => config.admins.roles.indexOf(r.id) >= 0) || guild.members.get(uid).roles.get(config.roles.immuneRole))) {
             callback("This user is unable to be warned due to immunity.");
         }
         else {
@@ -264,7 +261,7 @@ function warningRemove(wid, callback) {
 function warningCheck(uid, guild) {
     var userWarns = dbRequest("/users/" + uid);
     try {
-        if (userWarns !== undefined) {
+        if (userWarns !== undefined && guild.members.get(uid) !== undefined) {
             var warnedUser = guild.members.get(uid);
             if (userWarns.length == config.rules.RmuteAfter) {
                 warnedUser.addRole(config.roles.muteRole)
