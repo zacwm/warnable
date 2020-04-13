@@ -20,21 +20,18 @@ client.on("ready", () => {
 //- Commands
 const commands = {
     "warn": (msg) => {
-        if (msg.content.split(" ")[1].startsWith("<")) {
-            if (msg.mentions.members.first()) {
-                var warningUser = msg.mentions.members.first().id;
-                var warningReason = msg.content.replace(/<[@#][!&]?[0-9]+>/g, "").substring(config.prefix.length + 6);
-                if (warningReason !== "") {
-                    warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
-                        msg.channel.send(res);
-                    });
-                }
-                else {
-                    msg.reply("A reason must be included.");
-                }
-            }
-            else {
-                msg.reply("The mention is invalid.");
+        if (msg.content.split(" ")[1].match(/^(<[@][!]?)?([0-9]+)(>)?/g)) {
+            let warningUser = msg.content.split(" ")[1].match(/^(<[@][!]?)?([0-9]+)(>)?/g)[0]
+            var warningReason = msg.content.split(" ") // Use var cause we're gonna redefine this later
+            warningReason.shift() // Remove the first two items from array. This is hacky but gets the job done considering there is no command library
+            warningReason.shift() // .shift() returns the removed value and returns the original array, which is why we can't just .shift().shift()
+            warningReason = warningReason.join(" ")
+            if (warningReason !== "") {
+                warningAdd(warningUser, warningReason, msg.author, msg.guild, function(res) {
+                    msg.channel.send(res);
+                });
+            } else {
+                msg.reply("A reason must be included.");
             }
         }
         else if (msg.content.split(" ")[1].startsWith('"')) {
