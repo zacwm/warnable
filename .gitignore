@@ -1,3 +1,5 @@
-botData.json
-config.json
 node_modules
+package-lock.json
+.vscode
+jsondb.json
+config.js

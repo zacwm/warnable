@@ -1,39 +1,42 @@
 # Warnable
-[![Build Status](https://travis-ci.org/zacimac/warnable.svg?branch=master)](https://travis-ci.org/zacimac/warnable)
-[![star this repo](https://githubbadges.com/star.svg?user=zacimac&repo=warnable&style=flat)](https://github.com/zacimac/warnable)
-[![fork this repo](https://githubbadges.com/fork.svg?user=zacimac&repo=warnable&style=flat)](https://github.com/zacimac/warnable/fork)
+Version 2.0.0 (June 2020 - WIP)
 
-Warnable is a bot to be easy for any Discord server admin to be able to setup and use on their own system.
+## !! THIS VERSION IS NOT FINISHED !!
+This version is still in development! It is likely features are still missing. Please don't make an issue for this branch until it's released out of development. Contact me for suggestions or help: Zachary#0001
 
-### Features
-- Warn System
-- Simple warning commands
-- Easy to edit
+### Changes in 2.0.0
+- (+) Updated to Discord.js v12.
+- (+) Warning points.
+- (+) Prune messages.
+- (+) Multiple DB type support.
+- (+) Listing warnings now has pages.
+- (+) Extra logging - Message & user updates.
+- (+) Multiple Discord server support.
+- (+) Mute timer - With warnings or manually.
+- (-) Commands & events no longer in one file.
+- (-) User tags (eg: Zachary#0001) support.
+- (-) Warning ID's
 
 ### Commands
-The commands are pretty simple. Any new warnings will be saved under a 'warning ID'. Warning ID's can be used to remove warnings from users and probbaly more stuff as I keep updating this.
-Commands can only be accessed if the user ID is added or a guild role is added in the 'config.json'.
-Note: All commands must start with the prefix that is set in 'config.json'.
+All commands start with the prefix & can only be used by admins that are both set in the config | () = Required, [] = Optional
+#### `warn (@user) (points) [reason]`
+Adds warning points to the user. 
+User must be mentioned (Still possible to mention with ID if user is not in the guild/server). If no reason is provided, it will set the reason to "No reason provided".
 
-#### `warn {user} {reason}`
-The warn command will add a warning to the user along with the reason.
-The `{user}` can either be a mentioned user **OR** the username and discriminator surrounded by double quotes (e.g: "Zachary#0001")
+#### `remove (@user) [number]` | `remove last`
+User: Removes a warning from the user. If no number is specified, it will remove the users last warning, otherwise it will remove the warning from the position in their warning list. *If you wish to remove a certain amount of points, I suggest warning them with negative points*.
+Last: Removes the last warning given to any user within the guild/server.
 
-#### `remove {warning ID}`
-The remove command will delete the warning from the user and in the database.
-Warning ID's can be found after warning a user or listing warnings for a user with the 'list' command
+#### `list (@user) [page number]`
+Gets a list of warnings issued to the mentioned user. A maximum of 5 warnings will display on a page. If there are more than 5 warnings, use the page number to navigate through other pages (defaults to first page if none is specified).
 
-#### `list {user}`
-The list command will list all warnings that a user has recieved. (As a heads up, I plan on introducing pages for the lists in the future, so it won't encounter any character limits for lots of warnings)
-The `{user}` can either be a mentioned user **OR** the username and discriminator surrounded by double quotes (e.g: "Zachary#0001")
+#### `purge (number)`
+Bulk deletes the number of messages in the channel used in.
+
+#### `ping`
+🏓🏓🏓🏓🏓🏓🏓
+
+More moderation commands may be added in the future.
 
 ### Setup
-Note: You can find most ID's by making sure you have developer mode enabled in your Discord settings and then doing [this](https://zachary.fun/i/ITp6y.png)
-1. Rename "config.template.json" to "config.json"
-2. Enter in your bot token provided from the [Dicord Developer Portal](https://discordapp.com/developers/applications/) into the token field. 
-3. Add the bot to your server by following this link, making sure you replace the "{BOTS-CLIENT-ID-HERE}" with the Client ID provided in the Developer Portal. (NOTE!!! 2FA Must be enabled on the bot owners account for permissions to work)
-Link: https://discordapp.com/oauth2/authorize?client_id={BOTS-CLIENT-ID-HERE}&scope=bot&permissions=268443654
-4. Add user ID's or role ID's into the admin arrays. 
-5. Add the guild ID's and channel ID's.
-6. Run `npm install` in ternimal
-7. Start by running `npm start` or `node index.js`
+This version isn't quite finished yet, so I'll leave it up to you. The config should help you out quite a bit though. ¯\\\_(ツ)\_/¯
