@@ -1,9 +1,9 @@
 // Warnable 2.0.0 - Bot
-const config = require(`${__dirname}/config`);
+const config = require(`./config`);
 const fs = require("fs");
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const Database = require(`${__dirname}/databases/${config.database.type}`);
+const Database = require(`./db`);
 const db = new Database(config.database);
 
 var commands = {};

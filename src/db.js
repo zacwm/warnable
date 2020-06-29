@@ -4,8 +4,7 @@ const nodejsondb = require("node-json-db").JsonDB;
 module.exports = class db {
     constructor(options) {
         if (!options) options = {};
-        this.fileName = options.fileName || "jsondb";
-        this.db = new nodejsondb(this.fileName, true, true);
+        this.db = new nodejsondb(options.fileName || "jsondb", true, true);
     }
 
     addWarning(guild, user, points, reason, issuer) {
@@ -37,7 +36,7 @@ module.exports = class db {
         });
     }
 
-    removeWarning(guild, user, pos) {        
+    removeWarning(guild, user, pos) {
         return new Promise((resolve, reject) => {
             try {
                 pos = (pos - 1) * -1;

@@ -24,13 +24,13 @@ module.exports = {
         }
     },
 
-    msg: { // Bot message settings
+    msg: { // Bot message settings.
         // Colors used for embeds (https://zachary.fun/i/0vk7L.png)
         colorSuccess: 0x2ecc71,
         colorError: 0xe74c3c
     },
 
-    database: { // The Database options, check the README for more informaton.
-        type: "json" // DB module name ("json" = "./databases/json.js")
+    database: { // The Database options.
+        fileName: ""
     }
 }

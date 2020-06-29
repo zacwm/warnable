@@ -8,7 +8,7 @@ This version is still in development! It is likely features are still missing. P
 - (+) Updated to Discord.js v12.
 - (+) Warning points.
 - (+) Prune messages.
-- (+) Multiple DB type support.
+- (+) ~~Multiple DB type support.~~ (Sticking to node-json-db)
 - (+) Listing warnings now has pages.
 - (+) Extra logging - Message & user updates.
 - (+) Multiple Discord server support.
