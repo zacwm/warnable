@@ -9,7 +9,7 @@ warnable.client.on("message", msg => {
                 if (config.guilds[msg.guild.id].roles.admin.some(r => msg.member.roles.cache.has(r))) {
                     let command = msg.content.toLowerCase().split(" ")[0].substr(config.prefix.length);
                     if (warnable.commands.hasOwnProperty(command)) warnable.commands[command](msg);
-                    console.info("[command]", `${msg.author.tag} > "${msg.content}"`)
+                    console.info("[command]", `${msg.author.tag} > "${msg.content}"`);
                 }
                 else {
                     msg.channel.send("", { embed: {
