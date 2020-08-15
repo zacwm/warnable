@@ -15,6 +15,7 @@ module.exports = class db {
         return new Promise((resolve, reject) => {
             try {
                 this.db.push(`/guilds/${guild}/users/${user}/warnings[]`, { points, reason, issuer }, true);
+                this.db.push(`/guilds/${guild}/last`, user);
                 resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings`).reduce((prev, val) => prev + val.points, 0));
             }
             catch (err) {
@@ -43,9 +44,11 @@ module.exports = class db {
     removeWarning(guild, user, pos) {
         return new Promise((resolve, reject) => {
             try {
-                pos = (pos - 1) * -1;
+                pos = (!user) ? -1 : (pos - 1) * -1;
+                user = (!user) ? this.db.getData(`/guilds/${guild}/last`) : user; 
+                if (!user) this.db.delete(`/guilds/${guild}/last`);
                 this.db.delete(`/guilds/${guild}/users/${user}/warnings[${pos}]`);
-                resolve(true);
+                resolve(user);
             }
             catch (err) {
                 reject(err);
