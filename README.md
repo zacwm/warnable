@@ -2,17 +2,18 @@
 Version 2.0.0 (June 2020 - WIP)
 
 ## !! THIS VERSION IS NOT FINISHED !!
-This version is still in development! It is likely features are still missing. Please don't make an issue for this branch until it's released out of development. Contact me for suggestions or help: Zachary#0001
+This version is still in development! There is likely missing features and bugs, feel free to contact me on Discord @ Zachary#0001.
+
+Version 2.0 
 
 ### Changes in 2.0.0
 - (+) Updated to Discord.js v12.
 - (+) Warning points.
 - (+) Prune messages.
-- (+) ~~Multiple DB type support.~~ (Sticking to node-json-db)
 - (+) Listing warnings now has pages.
 - (+) Extra logging - Message & user updates.
 - (+) Multiple Discord server support.
-- (+) Mute timer - With warnings or manually.
+- (+) Mute and temp ban timer - Also supports leave/join bypass.
 - (-) Commands & events no longer in one file.
 - (-) User tags (eg: Zachary#0001) support.
 - (-) Warning ID's
@@ -30,11 +31,11 @@ Last: Removes the last warning given to any user within the guild/server.
 #### `list (@user) [page number]`
 Gets a list of warnings issued to the mentioned user. A maximum of 5 warnings will display on a page. If there are more than 5 warnings, use the page number to navigate through other pages (defaults to first page if none is specified).
 
-#### `purge (number)`
+#### `prune (number)`
 Bulk deletes the number of messages in the channel used in.
 
 #### `ping`
-🏓🏓🏓🏓🏓🏓🏓
+🏓 Table tennis and timers.
 
 More moderation commands may be added in the future.
 

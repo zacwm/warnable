@@ -4,7 +4,7 @@
   "description": "Simple Discord.js warning moderation bot",
   "main": "warnable.js",
   "scripts": {
-    "test": "node ./src/warnable.js"
+    "start": "node ./src/warnable.js"
   },
   "repository": {
     "type": "git",
