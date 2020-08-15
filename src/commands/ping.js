@@ -2,7 +2,12 @@
 const warnable = require("../warnable");
 
 warnable.command("ping", async (msg) => {
-    let pingingMsg = await msg.channel.send("Pinging..");
-    let diff = pingingMsg.createdTimestamp - msg.createdTimestamp // Calculate the response time
-    pingingMsg.edit(`Pong!\n${diff}ms`);
+    let pingingMsg = await msg.channel.send("", { embed: {
+        color: warnable.config.msg.colorSuccess,
+        description: "Pinging..."
+    }});
+    pingingMsg.edit("", { embed: {
+        color: warnable.config.msg.colorSuccess,
+        description: `**Pong!** Response time was ${pingingMsg.createdTimestamp - msg.createdTimestamp}ms`
+    }});
 });
