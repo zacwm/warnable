@@ -23,15 +23,24 @@ warnable.command("list", (msg) => {
                     }});
                 }
                 else {
-                    msg.channel.send("Page out of range. ");
+                    msg.channel.send("", { embed: {
+                        color: config.msg.colorError,
+                        description: "Page out of range."
+                    }});
                 }
             });
         }
         else {
-            msg.channel.send("Page number must be a number.");
+            msg.channel.send("", { embed: {
+                color: config.msg.colorError,
+                description: "Page argument must be a number"
+            }});
         }
     }
     else {
-        msg.channel.send("Format issue");
+        msg.channel.send("", { embed: {
+            color: config.msg.colorError,
+            description: "A user must be mentioned."
+        }});
     }
 });
