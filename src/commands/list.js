@@ -1,6 +1,6 @@
 // Warnable 2.0.0 - Command
 const warnable = require(`${__dirname}/../warnable`);
-const config = require(`${__dirname}/../config`);
+const config = warnable.config;
 
 warnable.command("list", (msg) => {
     var msgArgs = msg.content.split(" ");

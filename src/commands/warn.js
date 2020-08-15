@@ -1,6 +1,6 @@
 // Warnable 2.0.0 - Command
 const warnable = require(`${__dirname}/../warnable`);
-const config = require(`${__dirname}/../config`);
+const config = warnable.config;
 
 warnable.command("warn", (msg) => {
     var msgArgs = msg.content.split(" ");
@@ -14,21 +14,21 @@ warnable.command("warn", (msg) => {
             .then(data => {
                 warnable.pointsActions(msg.guild.id, userid, data);
                 msg.channel.send("", { embed: {
-                    color: 0x2ecc71,
+                    color: config.msg.colorSuccess,
                     description: `**${points} warning point${(!(points == 1 || points == -1)) ? "s" : ""}** (Total: ${data}) applied to <@${userid}> for \`${reason}\``
                 }});
             });
         }
         else {
             msg.channel.send("", { embed: {
-                color: 0xe74c3c,
+                color: config.msg.colorError,
                 description: "Unable to warn admins."
             }});
         }
     }
     else {
         msg.channel.send("", { embed: {
-            color: 0xe74c3c,
+            color: config.msg.colorError,
             description: "Missing user and/or points"
         }});
     }

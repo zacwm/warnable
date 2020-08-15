@@ -1,6 +1,6 @@
 // Warnable 2.0.0 - Event
 const warnable = require(`${__dirname}/../warnable`);
-const config = require(`${__dirname}/../config`);
+const config = warnable.config;
 
 warnable.client.on("message", msg => {
     if (!msg.author.bot && msg.guild) {
@@ -12,7 +12,7 @@ warnable.client.on("message", msg => {
                 }
                 else {
                     msg.channel.send("", { embed: {
-                        color: 0xe74c3c,
+                        color: warnable.config.msg.colorError,
                         description: "You do not have permission to use that command."
                     }});
                 }
