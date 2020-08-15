@@ -4,7 +4,7 @@ const fs = require("fs");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const Database = require(`./db`);
-const db = new Database(config.database);
+const db = new Database();
 
 var commands = {};
 

@@ -1,21 +1,25 @@
-// Warnable 2.0.0 - Database
+// Warnable 2.0.0 - Database (node-json-db)
 const nodejsondb = require("node-json-db").JsonDB;
 
+var options = {
+    // db_name: The name of the file that will save in the folder to hold all user warning data.
+    db_name: "warnableDB"
+}
+
 module.exports = class db {
-    constructor(options) {
-        if (!options) options = {};
-        this.db = new nodejsondb(options.fileName || "jsondb", true, true);
+    constructor() {
+        this.db = new nodejsondb(options.db_name, true, true);
     }
 
     addWarning(guild, user, points, reason, issuer) {
         return new Promise((resolve, reject) => {
             try {
-                this.db.push(`/guilds/${guild}/users/${user}[]`, { points, reason, issuer }, true);
-                resolve(this.db.getData(`/guilds/${guild}/users/${user}`).reduce((prev, val) => prev + val.points, 0));
+                this.db.push(`/guilds/${guild}/users/${user}/warnings[]`, { points, reason, issuer }, true);
+                resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings`).reduce((prev, val) => prev + val.points, 0));
             }
             catch (err) {
                 reject(err);
-            };
+            }
         });
     }
 
@@ -24,15 +28,15 @@ module.exports = class db {
             try {
                 if (pos) {
                     pos = (pos - 1) * -1;
-                    resolve(this.db.getData(`/guilds/${guild}/users/${user}[${pos}]`));
+                    resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings[${pos}]`));
                 }
                 else {
-                    resolve(this.db.getData(`/guilds/${guild}/users/${user}`).reverse());
+                    resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings`).reverse());
                 }
             }
             catch (err) {
                 resolve([]);
-            };
+            }
         });
     }
 
@@ -40,12 +44,23 @@ module.exports = class db {
         return new Promise((resolve, reject) => {
             try {
                 pos = (pos - 1) * -1;
-                this.db.delete(`/guilds/${guild}/users/${user}[${pos}]`);
+                this.db.delete(`/guilds/${guild}/users/${user}/warnings[${pos}]`);
                 resolve(true);
             }
             catch (err) {
                 reject(err);
-            };
+            }
+        });
+    }
+
+    getExtra(guild, user) {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(this.db.getData(`/guilds/${guild}/extras/${user}`));
+            }
+            catch (err) {
+                reject(err);
+            }
         });
     }
 }
