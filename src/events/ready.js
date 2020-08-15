@@ -3,7 +3,7 @@ const warnable = require("../warnable.js");
 const client = warnable.client;
 
 client.on("ready", () => {
-    console.log(`Now ready!\nSigned in as ${client.user.username}#${client.user.discriminator}`)
+    console.info("[ ready ]", `Signed in to Discord as ${client.user.tag}`);
 });
 
 client.login(warnable.config.token);
