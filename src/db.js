@@ -56,7 +56,7 @@ module.exports = class db {
     getExtra(guild, user) {
         return new Promise((resolve, reject) => {
             try {
-                resolve(this.db.getData(`/guilds/${guild}/extras/${user}`));
+                resolve(this.db.getData(`/guilds/${guild}/users/${user}/extras`));
             }
             catch (err) {
                 reject(err);
