@@ -11,6 +11,10 @@ warnable.command("list", (msg) => {
             page = parseInt(page) - 1;
             warnable.db.getWarnings(msg.guild.id, userid)
             .then(warnings => {
+                if (warnings.length == 0) return msg.channel.send("", { embed: {
+                    color: config.msg.colorSuccess,
+                    description: "User has no warnings."
+                }});
                 var array_chunks = Array(Math.ceil(warnings.length / 5)).fill().map((_, index) => index * 5).map(begin => warnings.slice(begin, begin + 5));
                 if (page > -1 && array_chunks.length > page) {
                     msg.channel.send("", { embed: {
