@@ -6,11 +6,31 @@ module.exports = {
 
     guilds: { // Guilds must be added in here for the bot to work in.
         "guild-id": {
-            points: { // Actions for if a user reaches above any point values. 0 to disable.
-                mute: 3, // Applies the mute role to the user.
-                kick: 5, // Kicks the user from the guild.
-                ban: 10 // Bans the user from the guild.
-            },
+            points: [ // Actions for if a user reaches above any point values.
+                // Range: The range of points for the action to trigger; Points must be lower number then higher number. 
+                // Message: "%guild" = The server name / "%points" = Their total points value when the action took place.
+                // Leave message blank ("") to disable.
+                {
+                    range: "5-7",
+                    action: "mute-1d",
+                    message: "You have been temporarily muted for one day in %guild"
+                },
+                {
+                    range: "8-11",
+                    action: "mute-7d",
+                    message: "You have been temporarily muted for seven days in %guild"
+                },
+                {
+                    range: "12-14",
+                    action: "ban-7d",
+                    message: "You have been temporarily banned for seven days in %guild"
+                },
+                {
+                    range: "15-100",
+                    action: "ban",
+                    message: "You have been permanently banned in %guild for reaching %points"
+                }
+            ],
             pointMessages: { // Messages to be sent via DM to the user who has reached a warning point action. Leave blank ("") to disable.
                 // "%guild" = The server name / "%points" = Their total points value when the action took place.
                 mute: "You have been muted in %guild for reaching %points warning points.",
