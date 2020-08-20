@@ -9,7 +9,7 @@ const db = new Database();
 var commands = {};
 var temps = {};
 
-module.exports = { client, config, db, commands, pointsActions, makeLog, command: (n, c) => { commands[n] = c; } };
+module.exports = { client, config, db, commands, checkPoints, makeLog, command: (n, c) => { commands[n] = c; } };
 
 // Load commands and events.
 (() => {
@@ -23,51 +23,41 @@ module.exports = { client, config, db, commands, pointsActions, makeLog, command
     });
 })();
 
-async function pointsActions(guildid, user, points) {
+function checkPoints(guildid, user, points) {
     let guildConfig = config.guilds[guildid];
-    let guild = client.guilds.cache.get(guildid);
-    let member = guild.members.cache.get(user);
+    guildConfig.points.forEach(async item => {
+        let itemPoints = item.range.split("-");
+        let guild = client.guilds.cache.get(guildid);
+        let member = guild.members.cache.get(user);
+        if (parseInt(itemPoints[0]) <= points && parseInt(itemPoints[1]) >= points) {
+            if (item.message) await member.user.send(item.message.replace("%guild", guild.name).replace("%points", points))
+            .catch(() => { makeLog(guildid, "warnings", `⚠️ There was an issue trying to send a DM to ${member.user.tag}`); });
+            pointsActions(guildid, item, { member, points });
+        }
+    });
+}
+
+function pointsActions(guildid, action, user) {
+    let actionType = action.action.split("-");
     // Ban
-    if (guildConfig.points.ban !== 0 && guildConfig.points.ban <= points) {
-        if (guildConfig.pointMessages.ban) await member.user.send(guildConfig.pointMessages.ban)
-        .catch(err => { // Log an issue in warning log channel that DM failed.
-            makeLog(guildid, "warnings", `⚠️ There was an issue trying to send a DM to ${member.tag}`);
-        });
-        member.ban({ days: 7, reason: `[warnable] Reaching ${guildConfig.points.ban}+ warning points` })
-        .then(() => { // Log that the user was banned.
-            makeLog(guildid, "warnings", `🔨 ${member.tag} was **banned** for reaching ${points}/${guildConfig.points.ban} warning points.`);
-        })
-        .catch(err => { // Log there was an issue banning.
-            makeLog(guildid, "warnings", `⚠️ ${member.tag} was attempted to be **banned** for ${points}/${guildConfig.points.ban} warning points, **but there was an issue.**`);
-        });
+    if (actionType[0] == "ban") {
+        user.member.ban({ reason: `[warnable] Reaching ${user.points} warning points` })
+        .then(() => { makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **banned** for reaching ${user.points} warning points.`); })
+        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${member.user.tag} was attempted to be **banned** for ${user.points} warning points, **but there was an issue.**`); });
     }
+
     // Kick
-    else if (guildConfig.points.kick !== 0 && guildConfig.points.kick <= points) {
-        if (guildConfig.pointMessages.kick) await member.user.send(guildConfig.pointMessages.kick)
-        .catch(err => { // Log an issue in warning log channel that DM failed.
-            makeLog(guildid, "warnings", `⚠️ There was an issue trying to send a DM to ${member.tag}`);
-        });
-        member.kick(`[warnable] Reaching ${guildConfig.points.ban}+ warning points`)
-        .then(() => { // Log that the user was kicked.
-            makeLog(guildid, "warnings", `👞 ${member.tag} was **kicked** for reaching ${points}/${guildConfig.points.kick} warning points.`);
-        })
-        .catch(err => { // Log there was an issue kicking.
-            makeLog(guildid, "warnings", `⚠️ ${member.tag} was attempted to be **kicked** for ${points}/${guildConfig.points.kick} warning points, **but there was an issue.**`);
-        });
+    if (actionType[0] == "kick") {
+        user.member.kick(`[warnable] Reaching ${user.points} warning points`)
+        .then(() => { makeLog(guildid, "warnings", `👞 ${user.member.user.tag} was **kicked** for reaching ${user.points} warning points.`); })
+        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **kicked** for ${user.points} warning points, **but there was an issue.**`); });
     }
+
     // Mute
-    else if (guildConfig.points.mute !== 0 && guildConfig.points.mute <= points) {
-        if (guildConfig.pointMessages.mute) await member.user.send(guildConfig.pointMessages.mute)
-        .catch(err => { // Log an issue in warning log channel that DM failed.
-            makeLog(guildid, "warnings", `⚠️ There was an issue trying to send a DM to ${member.tag}`);
-        });
-        member.roles.add(guildConfig.roles.mute)
-        .then(() => { // Log that the user was muted.
-            makeLog(guildid, "warnings", `🤫 ${member.tag} was **muted** for reaching ${points}/${guildConfig.points.mute} warning points.`);
-        })
-        .catch(err => { // Log there was an issue applying the role.
-            makeLog(guildid, "warnings", `⚠️ ${member.tag} was attempted to be **muted** for ${points}/${guildConfig.points.mute} warning points, **but there was an issue.**`);
-        });
+    if (actionType[0] == "mute") {
+        user.member.roles.add(config.guilds[guildid].roles.mute)
+        .then(() => { makeLog(guildid, "warnings", `🤫 ${user.member.user.tag} was **muted** for reaching ${user.points} warning points.`); })
+        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **muted** for ${user.points} warning points, **but there was an issue.**`); });
     }
 }
 
