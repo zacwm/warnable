@@ -11,11 +11,12 @@ module.exports = class db {
         this.db = new nodejsondb(options.db_name, true, true);
     }
 
-    addWarning(guild, user, points, reason, issuer) {
+    addWarning(guild, user, points, reason, issuer) { // Returns: Number (The users new total warning point value)
         return new Promise((resolve, reject) => {
             try {
                 this.db.push(`/guilds/${guild}/users/${user}/warnings[]`, { points, reason, issuer }, true);
                 this.db.push(`/guilds/${guild}/last`, user);
+                // Return data
                 resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings`).reduce((prev, val) => prev + val.points, 0));
             }
             catch (err) {
@@ -24,24 +25,26 @@ module.exports = class db {
         });
     }
 
-    getWarnings(guild, user, pos) {
+    getWarnings(guild, user, pos) { // Returns: Depends: Check below...
         return new Promise((resolve, reject) => {
             try {
-                if (pos) {
+                if (pos) { // If requesting single warning.
                     pos = (pos - 1) * -1;
+                    // Return warning object
                     resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings[${pos}]`));
                 }
-                else {
+                else { // If requesting all warnings.
+                    // Return array of warning objects. newest to oldest.
                     resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings`).reverse());
                 }
             }
-            catch (err) {
+            catch (err) { // If no warnings: Returns empty array.
                 resolve([]);
             }
         });
     }
 
-    removeWarning(guild, user, pos) {
+    removeWarning(guild, user, pos) { // Returns: User ID (no clue why, could be anything i think lol...)
         return new Promise((resolve, reject) => {
             try {
                 pos = (!user) ? -1 : (pos - 1) * -1;
@@ -49,17 +52,6 @@ module.exports = class db {
                 if (!user) this.db.delete(`/guilds/${guild}/last`);
                 this.db.delete(`/guilds/${guild}/users/${user}/warnings[${pos}]`);
                 resolve(user);
-            }
-            catch (err) {
-                reject(err);
-            }
-        });
-    }
-
-    getExtra(guild, user) {
-        return new Promise((resolve, reject) => {
-            try {
-                resolve(this.db.getData(`/guilds/${guild}/users/${user}/extras`));
             }
             catch (err) {
                 reject(err);
