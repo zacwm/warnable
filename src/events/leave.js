@@ -9,7 +9,7 @@ warnable.client.on("guildMemberRemove", (member) => {
         var cg = config.guilds[guild.id];
         if (cg.channels && cg.channels.users) {
             if (guild.channels.cache.get(cg.channels.users)) {
-                Promise.all([guild.fetchAuditLogs({limit: 1}), warnable.db.getWarnings(guild.id, user.id)])
+                warnable.db.getWarnings(guild.id, user.id)
                 .then(val => {
                     console.dir(val[0].entries.first());
                     guild.channels.cache.get(cg.channels.users).send("", { embed: {
@@ -21,7 +21,7 @@ warnable.client.on("guildMemberRemove", (member) => {
                             url: user.displayAvatarURL()
                         },
                         title: `${user.tag}`,
-                        description: `ID: ${user.id} | Type: ${"Unknown"}\nWarning points: ${val[1].reduce((prev, val) => prev + val.points, 0)}`
+                        description: `ID: ${user.id} | Warning points: ${val.reduce((prev, val) => prev + val.points, 0)}`
                     }});
                 });
             }
