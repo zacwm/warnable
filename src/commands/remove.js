@@ -21,9 +21,9 @@ warnable.command("remove", async (msg) => {
         });
     }
     // Remove a specific warning from a user
-    else if (/^<[@][!&]?[0-9]+>$/.test(msgArgs[1]) && /^[-]?[0-9]+$/.test(msgArgs[2])) {
+    else if (/^<[@][!&]?[0-9]+>$/.test(msgArgs[1])) {
         let userId = (msg.mentions.members.first()) ? msg.mentions.members.first().user.id : msgArgs[1].match(/[0-9]+/)[0];
-        let warningNum = parseInt(msgArgs[2]);
+        let warningNum = (msgArgs[2]) ? parseInt(msgArgs[2]) : 1;
         warnable.db.removeWarning(msg.guild.id, userId, warningNum)
         .then(user => {
             msg.channel.send("", { embed: {
