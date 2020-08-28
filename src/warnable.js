@@ -41,22 +41,31 @@ function pointsActions(guildid, action, user) {
     let actionType = action.action.split("-");
     // Ban
     if (actionType[0] == "ban") {
-        user.member.ban({ reason: `[warnable] Reaching ${user.points} warning points` })
-        .then(() => { 
-            temp[user.member.id] = {
-                type: "mute",
-                timeout: setTimeout(() => { 
-                    user.member.guild.members.unban(user.member.id)
-                    .then(() => {
-                
-                        makeLog(guildid, "warnings", `🙌 ${user.member.user.tag} was **unbaned** because their temp timer is up.`);
-                    })
-                    .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **unbaned** because timer was up, **but there was an issue.**`); });
-                }, 10000)
-            }
-            makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **banned** for reaching ${user.points} warning points.`); 
-        })
-        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **banned** for ${user.points} warning points, **but there was an issue.**`); });
+        if (actionType[1]) { // Temp ban
+            user.member.ban({ reason: `[warnable] Temp > Reaching ${user.points} warning points` })
+            .then(() => { 
+                temp[user.member.id] = {
+                    type: "mute",
+                    timeout: setTimeout(() => { 
+                        user.member.guild.members.unban(user.member.id)
+                        .then(() => {
+                            delete temp[user.member.id];
+                            makeLog(guildid, "warnings", `🙌 ${user.member.user.tag} was **unbaned** because their temp timer is up.`);
+                        })
+                        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **unbaned** because timer was up, **but there was an issue.**`); });
+                    }, moment(0).add(parseInt(actionType[1].replace(/[^\d]/g, "")), actionType[1].replace(/\d/g, "")).valueOf())
+                }
+                makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **temp-banned** for reaching ${user.points} warning points.`); 
+            })
+            .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **temp-banned** for ${user.points} warning points, **but there was an issue.**`); });
+        }
+        else { // Perm ban
+            user.member.ban({ reason: `[warnable] Reaching ${user.points} warning points` })
+            .then(() => { 
+                makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **banned** for reaching ${user.points} warning points.`); 
+            })
+            .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **banned** for ${user.points} warning points, **but there was an issue.**`); });
+        }
     }
 
     // Kick
@@ -68,22 +77,31 @@ function pointsActions(guildid, action, user) {
 
     // Mute
     if (actionType[0] == "mute") {
-        user.member.roles.add(config.guilds[guildid].roles.mute)
-        .then(() => { 
-            temp[user.member.id] = {
-                type: "mute",
-                timeout: setTimeout(() => { 
-                    user.member.guild.members.unban(user.member.id)
-                    .then(() => {
-                
-                        makeLog(guildid, "warnings", `🙌 ${user.member.user.tag} was **unmuted** because their temp timer is up.`);
-                    })
-                    .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **unmuted** because timer was up, **but there was an issue.**`); });
-                }, 10000)
-            }
-            makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **banned** for reaching ${user.points} warning points.`); 
-        })
-        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **muted** for ${user.points} warning points, **but there was an issue.**`); });
+        if (actionType[1]) { // Temp mute
+            user.member.roles.add(config.guilds[guildid].roles.mute)
+            .then(() => { 
+                temp[user.member.id] = {
+                    type: "mute",
+                    timeout: setTimeout(() => { 
+                        user.member.guild.members.unban(user.member.id)
+                        .then(() => {
+                            delete temp[user.member.id];
+                            makeLog(guildid, "warnings", `🙌 ${user.member.user.tag} was **unmuted** because their temp timer is up.`);
+                        })
+                        .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **unmuted** because timer was up, **but there was an issue.**`); });
+                    }, moment(0).add(parseInt(actionType[1].replace(/[^\d]/g, "")), actionType[1].replace(/\d/g, "")).valueOf())
+                }
+                makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **temp-muted** for reaching ${user.points} warning points.`); 
+            })
+            .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **temp-muted** for ${user.points} warning points, **but there was an issue.**`); });
+        }
+        else { // Perm mute
+            user.member.roles.add(config.guilds[guildid].roles.mute)
+            .then(() => { 
+                makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **muted** for reaching ${user.points} warning points.`); 
+            })
+            .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **muted** for ${user.points} warning points, **but there was an issue.**`); });
+        }
     }
 }
 
