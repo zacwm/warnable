@@ -3,7 +3,7 @@ const warnable = require("../warnable");
 
 warnable.command("prune", (msg) => {
     var msgArgs = msg.content.split(" ");
-    if (/^[-]?[0-9]+$/.test(msgArgs[1]) && parseInt(msgArgs[1] > 0)) {
+    if (/^[-]?[0-9]+$/.test(msgArgs[1]) && parseInt(msgArgs[1]) > 0) {
         msg.channel.bulkDelete(parseInt(msgArgs[1]))
         .then(messages => {
             msg.channel.send("", { embed: {
