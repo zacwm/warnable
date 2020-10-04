@@ -40,8 +40,8 @@ function checkPoints(guildid, user, points) {
 function pointsActions(guildid, action, user) {
     let actionType = action.action.split("-");
     // Ban
-    if (actionType[0] == "ban") {
-        if (actionType[1]) { // Temp ban
+    if (action.action == "ban") {
+        if (action.timer) { // Temp ban
             user.member.ban({ reason: `[warnable] Temp > Reaching ${user.points} warning points` })
             .then(() => { 
                 temp[user.member.id] = {
@@ -53,7 +53,7 @@ function pointsActions(guildid, action, user) {
                             makeLog(guildid, "warnings", `🙌 ${user.member.user.tag} was **unbaned** because their temp timer is up.`);
                         })
                         .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **unbaned** because timer was up, **but there was an issue.**`); });
-                    }, moment(0).add(parseInt(actionType[1].replace(/[^\d]/g, "")), actionType[1].replace(/\d/g, "")).valueOf())
+                    }, moment(0).add(parseInt(action.timer.replace(/[^\d]/g, "")), action.timer.replace(/\d/g, "")).valueOf())
                 }
                 makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **temp-banned** for reaching ${user.points} warning points.`); 
             })
@@ -69,15 +69,15 @@ function pointsActions(guildid, action, user) {
     }
 
     // Kick
-    if (actionType[0] == "kick") {
+    if (action.action == "kick") {
         user.member.kick(`[warnable] Reaching ${user.points} warning points`)
         .then(() => { makeLog(guildid, "warnings", `👞 ${user.member.user.tag} was **kicked** for reaching ${user.points} warning points.`); })
         .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **kicked** for ${user.points} warning points, **but there was an issue.**`); });
     }
 
     // Mute
-    if (actionType[0] == "mute") {
-        if (actionType[1]) { // Temp mute
+    if (action.action == "mute") {
+        if (action.timer) { // Temp mute
             user.member.roles.add(config.guilds[guildid].roles.mute)
             .then(() => { 
                 temp[user.member.id] = {
@@ -89,7 +89,7 @@ function pointsActions(guildid, action, user) {
                             makeLog(guildid, "warnings", `🙌 ${user.member.user.tag} was **unmuted** because their temp timer is up.`);
                         })
                         .catch(() => { makeLog(guildid, "warnings", `⚠️ ${user.member.user.tag} was attempted to be **unmuted** because timer was up, **but there was an issue.**`); });
-                    }, moment(0).add(parseInt(actionType[1].replace(/[^\d]/g, "")), actionType[1].replace(/\d/g, "")).valueOf())
+                    }, moment(0).add(parseInt(action.timer.replace(/[^\d]/g, "")), action.timer.replace(/\d/g, "")).valueOf())
                 }
                 makeLog(guildid, "warnings", `🔨 ${member.user.tag} was **temp-muted** for reaching ${user.points} warning points.`); 
             })
@@ -110,7 +110,10 @@ function makeLog(guild, type, message) {
     if (configChannels[type]) {
         try {
             let channel = client.guilds.cache.get(guild).channels.cache.get(configChannels[type]);
-            channel.send(message);
+            channel.send("", { embed: {
+                color: config.msg.colorSuccess,
+                description: message
+            }});
         }
         catch (err) {
             console.info("[ error ]", `Failed to log for ${type} channel in ${guild}.`);

@@ -12,7 +12,7 @@ warnable.command("warn", (msg) => {
         if ((msg.mentions.members.first()) ? !config.guilds[msg.guild.id].roles.admin.some(r => msg.mentions.members.first().roles.cache.has(r)) : true) {
             warnable.db.addWarning(msg.guild.id, userid, points, reason, issuer)
             .then(data => {
-                warnable.makeLog(msg.guild.id, "warnings", `🆕 **New warning** - <@${userid}> (Points: ${data}) was warned by <@${issuer}> for \`${reason}\``);
+                warnable.makeLog(msg.guild.id, "warnings", `**New warning**\n<@${userid}> (Points: ${data}) was warned by <@${issuer}>\nReason: \`${reason}\` for **${points}* point${(!(points == 1 || points == -1)) ? "s" : ""}`);
                 if (points > 0) warnable.checkPoints(msg.guild.id, userid, data);
                 msg.channel.send("", { embed: {
                     color: config.msg.colorSuccess,

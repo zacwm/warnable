@@ -1,10 +1,10 @@
 // Warnable 2.0.0 - Database (node-json-db)
-const nodejsondb = require("node-json-db").JsonDB;
-
 var options = {
     // db_name: The name of the file that will save in the folder to hold all user warning data.
     db_name: "warnableDB"
 }
+
+const nodejsondb = require("node-json-db").JsonDB;
 
 module.exports = class db {
     constructor() {
