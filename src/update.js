@@ -1,7 +1,7 @@
 // Warnable 2.0.0 - Updater (Convert Warnable 1.0.0 warnings for 2.0.0)
 
 var settings = {
-    guild: "669869390287863850", // The Discord Server ID to add the warnings to.
+    guild: "", // The Discord Server ID to add the warnings to.
     points: 1, // Warning points for each warning added.
     delay: 10, // Delay (in milliseconds) between adding warnings. This is for if you don't want to abuse your db.
 }
