@@ -32,6 +32,7 @@ Gets a list of warnings issued to the mentioned user. A maximum of 5 warnings wi
 
 ### `prune (number)`
 Bulk deletes the number of messages in the channel used in.
+Discord only allows up to 100 bulk deleting messages. Be careful repeating this command in a short period of time.
 
 ### `ping`
 🏓 Table tennis and timers.
