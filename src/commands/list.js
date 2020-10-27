@@ -20,7 +20,7 @@ warnable.command("list", (msg) => {
                     msg.channel.send("", { embed: {
                         color: config.msg.colorSuccess,
                         author: {
-                            name: `Warnings for ${userid}`
+                            name: `Warnings for <@${userid}> | ${userid}`
                         },
                         title: `Total: ${warnings.length} (${warnings.reduce((prev, val) => prev + val.points, 0)}) | Page: ${page + 1}/${array_chunks.length}`,
                         description: array_chunks[page].map((warning, index) => `**${index + 1}) ${warning.reason}**\n ‎ ‎ ‎Points: ${warning.points}‎ | By: <@${warning.issuer}>`).join("\n")
