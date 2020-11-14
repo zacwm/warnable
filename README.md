@@ -41,8 +41,7 @@ More moderation commands may be added in the future.
 
 ## Setup
 **Note 1:** For the bot to make use of all permisions, 2FA is required on the bot owners account.<br />
-**Note 2:** [Here is a link on how to find IDs in Discord](https://
-support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)<br />
+**Note 2:** [Here is a link on how to find IDs in Discord](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)<br />
 1. Navigate to the directory in terminal
 2. Ensure Node.js 12.0.0 or newer is installed by using `node -v`
 3. Install required packages by using `npm i`
