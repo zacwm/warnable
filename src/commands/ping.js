@@ -6,7 +6,7 @@ warnable.command("ping", async (msg) => {
         color: warnable.config.msg.colorSuccess,
         description: "Pinging..."
     }});
-    pingingMsg.edit("", { embed: {
+    pingingMsg.edit({ embed: {
         color: warnable.config.msg.colorSuccess,
         description: `**Pong!** Response time was ${pingingMsg.createdTimestamp - msg.createdTimestamp}ms`
     }});
