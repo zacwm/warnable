@@ -8,13 +8,13 @@ warnable.command("remove", async (msg) => {
     if (msgArgs[1] == "last") {
         warnable.db.removeWarning(msg.guild.id)
         .then(user => {
-            msg.channel.send("", { embed: {
+            msg.channel.send({ embed: {
                 color: warnable.config.msg.colorSuccess,
                 description: `Warning was removed for <@${user}>`
             }});
         })
         .catch(() => {
-            msg.channel.send("", { embed: {
+            msg.channel.send({ embed: {
                 color: warnable.config.msg.colorError,
                 description: "Failed to remove warning..."
             }});
@@ -26,13 +26,13 @@ warnable.command("remove", async (msg) => {
         let warningNum = (msgArgs[2]) ? parseInt(msgArgs[2]) : 1;
         warnable.db.removeWarning(msg.guild.id, userId, warningNum)
         .then(user => {
-            msg.channel.send("", { embed: {
+            msg.channel.send({ embed: {
                 color: warnable.config.msg.colorSuccess,
                 description: `Warning was removed for <@${user}>`
             }});
         })
         .catch(() => {
-            msg.channel.send("", { embed: {
+            msg.channel.send({ embed: {
                 color: warnable.config.msg.colorError,
                 description: "Failed to remove warning... Double check the user and warning number."
             }});
