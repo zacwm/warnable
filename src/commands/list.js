@@ -17,7 +17,7 @@ warnable.command("list", (msg) => {
                 }});
                 var array_chunks = Array(Math.ceil(warnings.length / 5)).fill().map((_, index) => index * 5).map(begin => warnings.slice(begin, begin + 5));
                 if (page > -1 && array_chunks.length > page) {
-                    msg.channel.send("", { embed: {
+                    msg.channel.send({ embed: {
                         color: config.msg.colorSuccess,
                         author: {
                             name: `Warnings for <@${userid}> | ${userid}`
@@ -27,7 +27,7 @@ warnable.command("list", (msg) => {
                     }});
                 }
                 else {
-                    msg.channel.send("", { embed: {
+                    msg.channel.send({ embed: {
                         color: config.msg.colorError,
                         description: "Page out of range."
                     }});
@@ -35,14 +35,14 @@ warnable.command("list", (msg) => {
             });
         }
         else {
-            msg.channel.send("", { embed: {
+            msg.channel.send({ embed: {
                 color: config.msg.colorError,
                 description: "Page argument must be a number"
             }});
         }
     }
     else {
-        msg.channel.send("", { embed: {
+        msg.channel.send({ embed: {
             color: config.msg.colorError,
             description: "A user must be mentioned."
         }});

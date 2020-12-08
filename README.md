@@ -41,16 +41,15 @@ More moderation commands may be added in the future.
 
 ## Setup
 **Note 1:** For the bot to make use of all permisions, 2FA is required on the bot owners account.<br />
-**Note 2:** [Here is a link on how to find IDs in Discord](https://
-support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)<br />
+**Note 2:** [Check out this to setup your own bot and get a token for it...](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+**Note 3:** [Here is a link on how to find IDs in Discord](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)<br />
 1. Navigate to the directory in terminal
 2. Ensure Node.js 12.0.0 or newer is installed by using `node -v`
 3. Install required packages by using `npm i`
 4. Rename `template.config.js` to `config.js`, then open and follow steps inside.
 5. Copy a DB type that you wish to use from the `/databases` folder and paste it in the `/src` folder with the name `db.js`
-6. Copy and use link, making sure to replace "{CLIENT-ID}" with the ID provided in the Developer Portal. Link: https://discordapp.com/oauth2/authorize?client_id={CLIENT-ID}&scope=bot&permissions=268443654
-7. To start bot, run `npm start`
-8. Done! :)
+6. To start bot, run `npm start`
+7. Done! :)
 
 ## Updating from v1.0.0
 Included is a script to convert the Warnable v1.0.0 JSON database for Warnable v2.0.0. **(( Make sure to complete the setup first and run the bot once! ))**<br />

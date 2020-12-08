@@ -14,21 +14,21 @@ warnable.command("warn", (msg) => {
             .then(data => {
                 warnable.makeLog(msg.guild.id, "warnings", `**New warning**\n<@${userid}> (Points: ${data}) was warned by <@${issuer}>\nReason: \`${reason}\` for **${points} point${(!(points == 1 || points == -1)) ? "s" : ""}**`);
                 if (points > 0) warnable.checkPoints(msg.guild.id, userid, data);
-                if (msg.channel.id !== config.guilds[msg.guild.id].channels.warnings) msg.channel.send("", { embed: {
+                if (msg.channel.id !== config.guilds[msg.guild.id].channels.warnings) msg.channel.send({ embed: {
                     color: config.msg.colorSuccess,
                     description: `**${points} warning point${(!(points == 1 || points == -1)) ? "s" : ""}** applied to <@${userid}> for \`${reason}\``
                 }});
             });
         }
         else {
-            msg.channel.send("", { embed: {
+            msg.channel.send({ embed: {
                 color: config.msg.colorError,
                 description: "Unable to warn admins."
             }});
         }
     }
     else {
-        msg.channel.send("", { embed: {
+        msg.channel.send({ embed: {
             color: config.msg.colorError,
             description: "Missing user and/or points"
         }});
