@@ -4,7 +4,7 @@ const config = warnable.config;
 
 warnable.command("warn", (msg) => {
     let msgArgs = msg.content.split(" ");
-    if (/^<[@][!&]?[0-9]+>$/.test(msgArgs[1]) && /^[-]?[0-9]+$/.test(msgArgs[2])) {
+    if ((/^<[@][!&]?[0-9]+>$/.test(msgArgs[1]) || /[0-9]+/.test(msgArgs[1])) && /^[-]?[0-9]+$/.test(msgArgs[2])) {
         let userid = (msg.mentions.members.first()) ? msg.mentions.members.first().user.id : msgArgs[1].match(/[0-9]+/)[0];
         let points = parseInt(msgArgs[2]);
         let reason = (msgArgs[3]) ? msg.content.substring(msgArgs.slice(0, 3).join(" ").length + 1) : "No reason provided";
