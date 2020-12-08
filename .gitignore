@@ -3,3 +3,6 @@ package-lock.json
 .vscode
 jsondb.json
 config.js
+botData.json
+warnableDB.json
+db.js

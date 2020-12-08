@@ -5,7 +5,7 @@ const config = warnable.config;
 warnable.command("list", (msg) => {
     var msgArgs = msg.content.split(" ");
     if (/^<[@][!&]?[0-9]+>$/.test(msgArgs[1])) {
-        var userid = (msg.mentions.members.first()) ?  msg.mentions.members.first().user.id : msgArgs[1].match(/[0-9]+/)[0];
+        var userid = (msg.mentions.members.first()) ? msg.mentions.members.first().user.id : msgArgs[1].match(/[0-9]+/)[0];
         var page = (msgArgs[2]) ? msgArgs[2] : "1";
         if (!isNaN(page)) {
             page = parseInt(page) - 1;
@@ -23,7 +23,7 @@ warnable.command("list", (msg) => {
                             name: `Warnings for <@${userid}> | ${userid}`
                         },
                         title: `Total: ${warnings.length} (${warnings.reduce((prev, val) => prev + val.points, 0)}) | Page: ${page + 1}/${array_chunks.length}`,
-                        description: array_chunks[page].map((warning, index) => `**${index + 1}) ${warning.reason}**\n ‎ ‎ ‎Points: ${warning.points}‎ | By: <@${warning.issuer}>`).join("\n")
+                        description: array_chunks[page].map((warning, index) => `**${index + 1}) ${warning.reason}**\n└  ‎Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.time) ? warning.time : "Unknown"}`).join("\n")
                     }});
                 }
                 else {

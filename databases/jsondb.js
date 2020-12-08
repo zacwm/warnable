@@ -1,10 +1,13 @@
 // Warnable 2.0.0 - Database (node-json-db)
 var options = {
     // db_name: The name of the file that will save in the folder to hold all user warning data.
-    db_name: "warnableDB"
+    db_name: "warnableDB",
+    // timezone: The timezone to be used to save and list warnings in... Example format: "Australia/Brisbane"
+    timezone: "Australia/Brisbane"
 }
 
 const nodejsondb = require("node-json-db").JsonDB;
+const moment = require("moment-timezone");
 
 module.exports = class db {
     constructor() {
@@ -14,7 +17,8 @@ module.exports = class db {
     addWarning(guild, user, points, reason, issuer) { // Returns: Number (The users new total warning point value)
         return new Promise((resolve, reject) => {
             try {
-                this.db.push(`/guilds/${guild}/users/${user}/warnings[]`, { points, reason, issuer }, true);
+                let time = moment().tz(options.timezone).format("MMM Do YYYY, h:mm a");
+                this.db.push(`/guilds/${guild}/users/${user}/warnings[]`, { points, reason, issuer, time }, true);
                 this.db.push(`/guilds/${guild}/last`, user);
                 // Return data
                 resolve(this.db.getData(`/guilds/${guild}/users/${user}/warnings`).reduce((prev, val) => prev + val.points, 0));
