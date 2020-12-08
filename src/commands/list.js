@@ -44,7 +44,7 @@ warnable.command("list", (msg) => {
     else {
         msg.channel.send({ embed: {
             color: config.msg.colorError,
-            description: "A user must be mentioned."
+            description: "A user must be specified."
         }});
     }
 });
