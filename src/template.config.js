@@ -31,19 +31,14 @@ module.exports = {
                     message: "You have been permanently banned in %guild for reaching %points"
                 }
             ],
-            pointMessages: { // Messages to be sent via DM to the user who has reached a warning point action. Leave blank ("") to disable.
-                // "%guild" = The server name / "%points" = Their total points value when the action took place.
-                mute: "You have been muted in %guild for reaching %points warning points.",
-                kick: "You have been kicked in %guild for reaching %points warning points.",
-                ban: "You have been banned in %guild for reaching %points warning points.\nhttps://youtu.be/fC7oUOUEEi4"
-            },
             roles: { // Role ID's for the guild.
                 mute: "", // Used for the mute function.
                 immune: [], // Auto mod ignores anyone with the role applied.
                 admin: [] // Admins can apply, remove warnings and adjust guild settings.
             },
             channels: { // Channel ID's to send logs. "" to disable > Note: Logs will still display in the console if disabled.
-                warnings: "", // New warnings and actions from points (mute, kick & banning).
+                important: "", // Actions (mute, kick or ban) on a user from points or manual commands.
+                warnings: "", // New warnings that were added to a user.
                 messages: "", // Edits or deletions to messages.
                 users: "" // Users join or leaving.
             }
