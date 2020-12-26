@@ -17,10 +17,11 @@ warnable.command("list", (msg) => {
                 }});
                 var array_chunks = Array(Math.ceil(warnings.length / 5)).fill().map((_, index) => index * 5).map(begin => warnings.slice(begin, begin + 5));
                 if (page > -1 && array_chunks.length > page) {
+                    let memberTitle = msg.guild.members.cache.get(userid) ? `${msg.guild.members.cache.get(userid).user.tag} (${userid})` : userid
                     msg.channel.send({ embed: {
                         color: config.msg.colorSuccess,
                         author: {
-                            name: `Warnings for ${(msg.mentions.members.first()) ? `${msg.mentions.members.first().user.tag} (${userid})` : userid}`
+                            name: `Warnings for ${memberTitle}`
                         },
                         title: `Total: ${warnings.length} (${warnings.reduce((prev, val) => prev + val.points, 0)}) | Page: ${page + 1}/${array_chunks.length}`,
                         description: array_chunks[page].map((warning, index) => `**${index + 1}) ${warning.reason}**\n└  ‎Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.time) ? warning.time : "Unknown"}`).join("\n")
