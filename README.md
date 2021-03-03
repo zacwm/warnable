@@ -40,7 +40,7 @@ Discord only allows up to 100 bulk deleting messages. Be careful repeating this 
 More moderation commands may be added in the future.
 
 ## Thanks to!
-[All contribuitors who help improve this repo for others! <3](https://github.com/zacimac/warnable/graphs/contributors)
+[All contribuitors who help improve this repo for others! ♥](https://github.com/zacimac/warnable/graphs/contributors)<br />
 And all of my sponsors ♥
 - 🌟 [@aditya-learns](https://github.com/aditya-learns)
 - 🌟 [@elybeatmaker](https://github.com/elybeatmaker)
