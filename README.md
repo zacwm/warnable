@@ -39,6 +39,12 @@ Discord only allows up to 100 bulk deleting messages. Be careful repeating this 
 
 More moderation commands may be added in the future.
 
+## Thanks to!
+[All contribuitors who help improve this repo for others! <3](https://github.com/zacimac/warnable/graphs/contributors)
+And all of my sponsors ♥
+- 🌟 [@aditya-learns](https://github.com/aditya-learns)
+- 🌟 [@elybeatmaker](https://github.com/elybeatmaker)
+
 ## Setup
 **Note 1:** For the bot to make use of all permisions, 2FA is required on the bot owners account.<br />
 **Note 2:** [Check out this to setup your own bot and get a token for it...](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
