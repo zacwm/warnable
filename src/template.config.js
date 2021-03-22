@@ -34,6 +34,7 @@ module.exports = {
             roles: { // Role ID's for the guild.
                 mute: "", // Used for the mute function.
                 immune: [], // Auto mod ignores anyone with the role applied.
+                moderator: [], // Moderators can only view warnings.
                 admin: [] // Admins can apply, remove warnings and adjust guild settings.
             },
             channels: { // Channel ID's to send logs. "" to disable > Note: Logs will still display in the console if disabled.

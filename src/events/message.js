@@ -8,7 +8,8 @@ warnable.client.on("message", msg => {
             if (msg.content.startsWith(config.prefix)) {
                 let command = msg.content.toLowerCase().split(" ")[0].substr(config.prefix.length);
                 if (warnable.commands.hasOwnProperty(command)) { 
-                    if (config.guilds[msg.guild.id].roles.admin.some(r => msg.member.roles.cache.has(r))) {
+                    if (config.guilds[msg.guild.id].roles.admin.some(r => msg.member.roles.cache.has(r)) || 
+                    (config.guilds[msg.guild.id].roles.moderator || [] /* ¯\_(ツ)_/¯ */).some(r => msg.member.roles.cache.has(r))) {
                         warnable.commands[command](msg);
                         console.info("[command]", `${msg.author.tag} > "${msg.content}"`);
                     } else {
