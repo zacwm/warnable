@@ -1,6 +1,6 @@
 {
   "name": "warnable",
-  "version": "2.0.0",
+  "version": "2.0.7",
   "description": "Simple Discord.js warning moderation bot",
   "main": "warnable.js",
   "scripts": {

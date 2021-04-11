@@ -13,7 +13,16 @@ warnable.command("warn", (msg) => {
             warnable.db.addWarning(msg.guild.id, userid, points, reason, issuer)
             .then(data => {
                 warnable.makeLog(msg.guild.id, "warnings", `**New warning**\n<@${userid}> (Points: ${data}) was warned by <@${issuer}>\nReason: \`${reason}\` for **${points} point${(!(points == 1 || points == -1)) ? "s" : ""}**`);
-                if (points > 0) warnable.checkPoints(msg.guild.id, userid, data);
+                if (points > 0) {
+                    warnable.checkPoints(msg.guild.id, userid, data);
+                    if (config.guilds[msg.guild.id].directmessage) {
+                        let dm = config.guilds[msg.guild.id].directmessage
+                        dm = dm.replace("%points", points);
+                        dm = dm.replace("%total", data);
+                        dm = dm.replace("%reason", reason);
+                        msg.guild.members.cache.get(userid).user.send(dm);
+                    }
+                }
                 if (msg.channel.id !== config.guilds[msg.guild.id].channels.warnings) msg.channel.send({ embed: {
                     color: config.msg.colorSuccess,
                     description: `**${points} warning point${(!(points == 1 || points == -1)) ? "s" : ""}** applied to <@${userid}> for \`${reason}\``

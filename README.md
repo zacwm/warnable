@@ -2,8 +2,7 @@
   <img src="https://zachary.fun/assets/images/work/warnable.png"/>
 </p>
 
-Version 2.0.0<br/>
-I'm happy to call v2.0.0 ready! 🎉
+Version 2.0.7<br/>
 
 ## Changes in 2.0.0
 - (+) Updated to Discord.js v12.

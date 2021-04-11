@@ -31,6 +31,8 @@ module.exports = {
                     message: "You have been permanently banned in %guild for reaching %points"
                 }
             ],
+            directmessage: "⚠ **You have been warned!** ⚠\n> You recieved %points point(s) for `%reason`.\n> You now have a total of %total point(s).", // Direct message the user whenever warned. "" to disable. 
+            // "\n" = next line. "%points" = points warned, "%total" = their total points, "%reason" = the reason they were warned.
             roles: { // Role ID's for the guild.
                 mute: "", // Used for the mute function.
                 immune: [], // Auto mod ignores anyone with the role applied.
