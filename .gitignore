@@ -1,8 +1,2 @@
-node_modules
-package-lock.json
-.vscode
-jsondb.json
-config.js
-botData.json
-warnableDB.json
-db.js
+/node_modules
+.env
