@@ -25,10 +25,20 @@ exports.meta = {
   ],
 };
 
+const { db } = require('../warnable');
+
 exports.interaction = async (interaction) => {
   if (!interaction.isCommand()) return;
-	if (interaction.commandName === 'warn') {
-    console.dir(interaction);
-    await interaction.reply('Hello!');
+	if (interaction.commandName === this.meta.name) {
+    db.addWarning(interaction.guildID,
+      interaction.options[0].value.match(/\d+/g)[0],
+      interaction.options[1].value,
+      interaction.options[2].value,
+    ).then(async () => {
+      await interaction.reply(`${new Date(new Date().toUTCString())}`, { ephemeral: true });
+    }).catch(async err => {
+      console.err(err);
+      await interaction.reply('Something failed!', { ephemeral: true });
+    });
   }
 };

@@ -7,5 +7,5 @@ exports.meta = {
 
 exports.interaction = async (interaction) => {
   if (!interaction.isCommand()) return;
-	if (interaction.commandName === 'hi') await interaction.reply('Hello!', { ephemeral: true });
+	if (interaction.commandName === this.meta.name) await interaction.reply('Hello!', { ephemeral: true });
 };

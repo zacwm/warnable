@@ -10,6 +10,7 @@
   "author": "Zachary (@zacimac)",
   "license": "MIT",
   "dependencies": {
+    "better-sqlite3": "^7.4.0",
     "directory-tree": "^2.2.9",
     "discord.js": "github:discordjs/discord.js",
     "dotenv": "^9.0.2",

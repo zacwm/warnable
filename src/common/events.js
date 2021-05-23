@@ -28,21 +28,20 @@ client.on('ready', async () => {
 });
 
 client.on('message', (msg) => {
-  for(let command in commands) {
-    try {
-      if (commands[command].hasOwnProperty('message')) commands[command].message(message);
-    } catch(e) {
-      logs('error', `Event error on 'message' by '${command}'`);
-    };
-  }
+  cmdEvent('message', (msg));
 });
 
 client.on('interaction', async interaction => {
+  cmdEvent('interaction', (interaction));
+  logs('event', `Interaction run by ${interaction.user.tag} (${interaction.user.id})`);
+});
+
+function cmdEvent(event, vals) {
   for(let command in commands) {
     try {
-      if (commands[command].hasOwnProperty('interaction')) commands[command].interaction(interaction);
+      if (commands[command].hasOwnProperty(event)) commands[command][event](vals);
     } catch(e) {
-      logs('error', `Event error on 'interaction' by '${command}'`);
+      logs('error', `Event error on '${event}' by '${command}'`);
     };
   }
-});
+}
