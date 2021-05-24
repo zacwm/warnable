@@ -33,7 +33,7 @@ client.on('message', (msg) => {
 
 client.on('interaction', async interaction => {
   cmdEvent('interaction', (interaction));
-  logs('event', `Interaction run by ${interaction.user.tag} (${interaction.user.id})`);
+  logs('event', `Interaction ${interaction.isCommand() ? `'${interaction.commandName}'` : ''} run by ${interaction.user.tag} (${interaction.user.id})`);
 });
 
 function cmdEvent(event, vals) {

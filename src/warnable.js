@@ -24,12 +24,12 @@ try {
 catch(err) {
   if (err.code === 'MODULE_NOT_FOUND' && err.message.includes('./database')) {
     console.error('No database file was found.\n- Check the SETUP.md file for a guide to setup warnable.');
-    process.exit(0);
   }
   else {
     console.error(err);
     console.error('Database file failed to load. You should report the error above as a GitHub issue.');
   }
+  process.exit(0);
 }
 
 const { Client, Intents } = require('discord.js');

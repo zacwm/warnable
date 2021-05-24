@@ -5,7 +5,19 @@ exports.meta = {
   description: 'Replies with hello back!',
 };
 
-exports.interaction = async (interaction) => {
+const { db } = require('../warnable');
+
+exports.interaction = (interaction) => {
   if (!interaction.isCommand()) return;
-	if (interaction.commandName === this.meta.name) await interaction.reply('Hello!', { ephemeral: true });
+	if (interaction.commandName === this.meta.name) {
+    db.getGuild(interaction.guildID)
+    .then(v => {
+      console.dir(v);
+      interaction.reply('Hello!', { ephemeral: true });
+    })
+    .catch(err => {
+      console.error(err);
+      interaction.reply('Something failed.', { ephemeral: true });
+    });
+  }
 };

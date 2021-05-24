@@ -34,11 +34,12 @@ exports.interaction = async (interaction) => {
       interaction.options[0].value.match(/\d+/g)[0],
       interaction.options[1].value,
       interaction.options[2].value,
-    ).then(async () => {
-      await interaction.reply(`${new Date(new Date().toUTCString())}`, { ephemeral: true });
-    }).catch(async err => {
+    ).then((v) => {
+      if (v) interaction.reply(`**${interaction.options[1].value} points** applied to \`${interaction.options[0].value}\`${interaction.options[2] ? ` for \`${interaction.options[2].value}\`` : ''}`, { ephemeral: true });
+      else interaction.reply('The warning couldn\'t be applied.', { ephemeral: true });
+    }).catch(err => {
       console.err(err);
-      await interaction.reply('Something failed!', { ephemeral: true });
+      interaction.reply('Something failed!', { ephemeral: true });
     });
   }
 };
