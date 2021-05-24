@@ -25,21 +25,76 @@ exports.meta = {
   ],
 };
 
+const { MessageEmbed } = require('discord.js');
 const { db } = require('../warnable');
 
-exports.interaction = async (interaction) => {
+exports.interaction = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    db.addWarning(interaction.guildID,
-      interaction.options[0].value.match(/\d+/g)[0],
-      interaction.options[1].value,
-      interaction.options[2].value,
-    ).then((v) => {
-      if (v) interaction.reply(`**${interaction.options[1].value} points** applied to \`${interaction.options[0].value}\`${interaction.options[2] ? ` for \`${interaction.options[2].value}\`` : ''}`, { ephemeral: true });
-      else interaction.reply('The warning couldn\'t be applied.', { ephemeral: true });
-    }).catch(err => {
-      console.err(err);
-      interaction.reply('Something failed!', { ephemeral: true });
+    db.getGuild(interaction.guildID).then(async (g) => {
+      if (g) {
+        const member = await interaction.member.fetch();
+        if (member.roles.cache.find(role => [g.rAdmin, g.rMod].includes(role.id)) !== undefined) {
+          db.addWarning(interaction.guildID,
+            interaction.options[0].value.match(/\d+/g)[0],
+            interaction.options[1].value,
+            interaction.user.id,
+            interaction.options[2].value,
+          ).then((v) => {
+            if (v) {
+              const embedMessage = new MessageEmbed()
+              .setTitle('Warning added!')
+              .setDescription(`**Warned:** <@${interaction.options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].value.match(/\d+/g)[0]})`
+              + `\n**Points:** ${interaction.options[1].value} point${interaction.options[1].value !== 1 ? 's' : ''}`
+              + `\n**Reason:** \`${interaction.options[2].value ? interaction.options[2].value : 'No reason provied.'}\``);
+              interaction.reply({
+                embeds: [ embedMessage ],
+                ephemeral: true,
+              });
+            }
+            else {
+              const embedMessage = new MessageEmbed()
+              .setDescription('The warning couldn\'t be applied.');
+              interaction.reply({
+                embeds: [ embedMessage ],
+                ephemeral: true,
+              });
+            }
+          }).catch(vErr => {
+            console.err(vErr);
+            const embedMessage = new MessageEmbed()
+            .setDescription('Something failed...');
+            interaction.reply({
+              embeds: [ embedMessage ],
+              ephemeral: true,
+            });
+          });
+        }
+        else {
+          const embedMessage = new MessageEmbed()
+          .setDescription('You don\'t have permission to use this command.');
+          interaction.reply({
+            embeds: [ embedMessage ],
+            ephemeral: true,
+          });
+        }
+      }
+      else {
+        const embedMessage = new MessageEmbed()
+        .setDescription('This server isn\'t configured by the bot admin.');
+        interaction.reply({
+          embeds: [ embedMessage ],
+          ephemeral: true,
+        });
+      }
+    }).catch(gErr => {
+      console.err(gErr);
+      const embedMessage = new MessageEmbed()
+      .setDescription('Something failed...');
+      interaction.reply({
+        embeds: [ embedMessage ],
+        ephemeral: true,
+      });
     });
   }
 };

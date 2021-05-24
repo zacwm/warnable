@@ -17,6 +17,9 @@ exports.interaction = async (interaction) => {
       '❗ [Click here](https://github.com/zacimac/warnable/issues) to report an issue.\n' +
       '❤ [Give this project a star on GitHub](https://github.com/zacimac/warnable)')
       .setFooter(`Running warnable@${package.version}`);
-    await interaction.reply(embedMessage, { ephemeral: true });
+    await interaction.reply({
+      embeds: [ embedMessage ],
+      ephemeral: true,
+    });
   }
 };

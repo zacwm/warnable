@@ -1,6 +1,6 @@
 # warnable | v3-dev | Commands
 
-### !! Commands run through Discord slash commands. No prefix. !!
+### !! Commands run through Discord slash commands. No prefix. (except some bot admin commands) !!
 ### !! this is the plan... may not work, may not be done... good luck :) !!
 <br/>
 
@@ -16,11 +16,10 @@ unpunish | Will remove the punishment and unban/unmute the user. This works for 
 
 <br />
 
-## Admin commands
-**READ THIS** --> Admin commands can only be used in one config set guild and will work with the config set admin role. 
+## Bot admin commands
+**READ THIS** --> Bot admin commands are mainly used to prepare the bot... Bot admins must be set in the `.env` as user ID's. All bot admin commands start with `!admin [command name here] ...` 
 <br/>
 
 Name | Description | Example Usage
 --- |--- |---
-status | Returns an overview of useful things(?) | `/status`
-guild | Add or remove the guild to the guilds to work for.  | `/guild add Guild_ID`<br />`/guild remove Guild_ID`  
+setAdmin | Sets a admin role in the current server. **SERVER ADMINS ARE NOT BOT ADMINS ->** Server admins have access to everything in the server only as well as configuring server settings.  | `!admin setAdmin 123`

@@ -15,7 +15,7 @@ module.exports = class db {
     // warnings - guild, user, points, issuer, reason, unixTime
     this.db.prepare('CREATE TABLE IF NOT EXISTS warnings (guild TEXT NOT NULL, user TEXT NOT NULL, points INTEGER, issuer TEXT NOT NULL, reason TEXT NOT NULL, unixTime TEXT NOT NULL)').run();
     // guilds - *guild, rAdmin, rMod, rViewer, cWarnings, cMsg, cUsers
-    this.db.prepare('CREATE TABLE IF NOT EXISTS guilds (guild TEXT NOT NULL, rAdmin TEXT, rMod TEXT, rViewer TEXT, cWarnings TEXT, cMsg TEXT, cUsers TEXT)').run();
+    this.db.prepare('CREATE TABLE IF NOT EXISTS guilds (guild TEXT NOT NULL, rAdmin TEXT, rMod TEXT, rViewer TEXT, rImmune TEXT, cWarnings TEXT, cMsg TEXT, cUsers TEXT)').run();
     this.guildCache = [];
   }
 

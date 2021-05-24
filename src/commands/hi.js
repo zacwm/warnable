@@ -11,13 +11,13 @@ exports.interaction = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
     db.getGuild(interaction.guildID)
-    .then(v => {
+    .then(async v => {
       console.dir(v);
-      interaction.reply('Hello!', { ephemeral: true });
+      await interaction.reply('Hello!', { ephemeral: true });
     })
-    .catch(err => {
-      console.error(err);
-      interaction.reply('Something failed.', { ephemeral: true });
+    .catch(async (vErr) => {
+      console.error(vErr);
+      await interaction.reply('Something failed.', { ephemeral: true });
     });
   }
 };
