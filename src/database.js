@@ -14,9 +14,11 @@ module.exports = class db {
     // # Tables
     // warnings - guild, user, points, issuer, reason, unixTime
     this.db.prepare('CREATE TABLE IF NOT EXISTS warnings (guild TEXT NOT NULL, user TEXT NOT NULL, points INTEGER, issuer TEXT NOT NULL, reason TEXT NOT NULL, unixTime TEXT NOT NULL)').run();
-    // guilds - *guild, rAdmin, rMod, rViewer, cWarnings, cMsg, cUsers
+    // guilds - guild, rAdmin, rMod, rViewer, cWarnings, cMsg, cUsers
     this.db.prepare('CREATE TABLE IF NOT EXISTS guilds (guild TEXT NOT NULL, rAdmin TEXT, rMod TEXT, rViewer TEXT, rImmune TEXT, cWarnings TEXT, cMsg TEXT, cUsers TEXT)').run();
     this.guildCache = [];
+    // punishments = guild, user, type, issuer, unixFinish
+    this.db.prepare('CREATE TABLE IF NOT EXISTS punishments (guild TEXT NOT NULL, user TEXT NOT NULL, type TEXT, issuer TEXT NOT NULL, unixFinish TEXT NOT NULL)').run();
   }
 
   // # Warnings
@@ -38,6 +40,32 @@ module.exports = class db {
       try {
         const warningPrep = this.db.prepare('SELECT * FROM warnings WHERE guild = ? AND user = ?').all(guild, user);
         resolve(warningPrep);
+      }
+      catch(err) {
+        reject(err);
+      }
+    });
+  }
+
+  // # Punishments
+  listPunishments(guild) {
+    return new Promise((resolve, reject) => {
+      try {
+        const punishListPrep = this.db.prepare('SELECT * FROM punishments WHERE guild = ?').all(guild);
+        resolve(punishListPrep);
+      }
+      catch(err) {
+        reject(err);
+      }
+    });
+  }
+
+  addPunishment(guild, user, type, issuer, unixFinish) {
+    return new Promise((resolve, reject) => {
+      try {
+        const warningPrep = this.db.prepare('INSERT INTO punishments (guild, user, type, issuer, unixFinish) VALUES (?, ?, ?, ?, ?, ?)');
+        const warningExec = warningPrep.run(guild, user, type, issuer, unixFinish);
+        resolve(warningExec.changes);
       }
       catch(err) {
         reject(err);

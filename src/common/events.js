@@ -2,33 +2,39 @@
 // Handles events recieved from Discord.
 
 const { client, commands, logs } = require('../warnable');
+const punishments = require('./punishments');
 
 client.on('ready', async () => {
-  if (!client.application?.owner) await client.application?.fetch();
+  if (!client.application.owner) await client.application.fetch();
   logs('event', `Logged in and ready as '${client.user.tag}'`);
-  
-  let cmdData = [];
+  const cmdData = [];
 
-  for(let command in commands) {
+  for(const command in commands) {
     try {
-      if (commands[command].hasOwnProperty('ready')) commands[command].ready();
-      if (commands[command].hasOwnProperty('meta')) {
+      if (commands[command]['ready']) commands[command].ready();
+      if (commands[command]['meta']) {
         cmdData.push(commands[command].meta);
       }
-    } catch(e) {
+    }
+    catch(e) {
       logs('error', `Event error on 'ready' by '${command}'`);
-    };
+    }
   }
 
-  let appCommands = await client.application?.commands.set(cmdData);
-  logs('command', `${appCommands.size} application commands applied! `)
+  const appCommands = await client.application.commands.set(cmdData);
+  logs('command', `${appCommands.size} application commands applied! `);
   appCommands.forEach((cmd) => {
-    logs('command', `Intention ID: ${cmd.id} | Name: ${cmd.name} (${cmd.description})`)
+    logs('command', `Intention ID: ${cmd.id} | Name: ${cmd.name} (${cmd.description})`);
   });
 });
 
 client.on('message', (msg) => {
   cmdEvent('message', (msg));
+});
+
+client.on('guildMemberAdd', (member) => {
+  //punishments.rejoin(member.guild.id, member.user.id);
+  cmdEvent('guildMemberAdd', (member));
 });
 
 client.on('interaction', async interaction => {
@@ -37,11 +43,12 @@ client.on('interaction', async interaction => {
 });
 
 function cmdEvent(event, vals) {
-  for(let command in commands) {
+  for(const command in commands) {
     try {
-      if (commands[command].hasOwnProperty(event)) commands[command][event](vals);
-    } catch(e) {
+      if (commands[command][event]) commands[command][event](vals);
+    }
+    catch(e) {
       logs('error', `Event error on '${event}' by '${command}'`);
-    };
+    }
   }
 }

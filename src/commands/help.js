@@ -1,14 +1,14 @@
 // # warnable v3-dev | Command
 
+const { MessageEmbed } = require('discord.js');
+const package = require('../../package.json');
+
 exports.meta = {
   name: 'help',
   description: 'Provides help with warnable!',
 };
 
-const { MessageEmbed } = require('discord.js');
-const package = require('../../package.json');
-
-exports.interaction = async (interaction) => {
+exports.interaction = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
     const embedMessage = new MessageEmbed()
@@ -17,9 +17,6 @@ exports.interaction = async (interaction) => {
       '❗ [Click here](https://github.com/zacimac/warnable/issues) to report an issue.\n' +
       '❤ [Give this project a star on GitHub](https://github.com/zacimac/warnable)')
       .setFooter(`Running warnable@${package.version}`);
-    await interaction.reply({
-      embeds: [ embedMessage ],
-      ephemeral: true,
-    });
+    interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
   }
 };

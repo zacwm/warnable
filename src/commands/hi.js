@@ -1,23 +1,30 @@
 // # warnable v3-dev | Command
 
+const { MessageEmbed } = require('discord.js');
+const fetch = require('node-fetch');
+
 exports.meta = {
   name: 'hi',
   description: 'Replies with hello back!',
 };
 
-const { db } = require('../warnable');
-
 exports.interaction = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    db.getGuild(interaction.guildID)
-    .then(async v => {
-      console.dir(v);
-      await interaction.reply('Hello!', { ephemeral: true });
+    console.dir(interaction);
+    fetch('http://aws.random.cat/meow')
+    .then(res => res.json())
+    .then(json => {
+      const embedMessage = new MessageEmbed()
+      .setTitle('Hello! :)')
+      .setDescription('Here\'s a cat...')
+      .setImage(json.file);
+      interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
     })
-    .catch(async (vErr) => {
-      console.error(vErr);
-      await interaction.reply('Something failed.', { ephemeral: true });
+    .catch(() => {
+      const embedMessage = new MessageEmbed()
+      .setDescription('Hello! :)');
+      interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
     });
   }
 };
