@@ -14,9 +14,6 @@ module.exports = class db {
     // # Tables
     // warnings - guild, user, points, issuer, reason, unixTime
     this.db.prepare('CREATE TABLE IF NOT EXISTS warnings (guild TEXT NOT NULL, user TEXT NOT NULL, points INTEGER, issuer TEXT NOT NULL, reason TEXT NOT NULL, unixTime TEXT NOT NULL)').run();
-    // guilds - guild, rAdmin, rMod, rViewer, cWarnings, cMsg, cUsers
-    this.db.prepare('CREATE TABLE IF NOT EXISTS guilds (guild TEXT NOT NULL, rAdmin TEXT, rMod TEXT, rViewer TEXT, rImmune TEXT, cWarnings TEXT, cMsg TEXT, cUsers TEXT)').run();
-    this.guildCache = [];
     // punishments = guild, user, type, issuer, unixFinish
     this.db.prepare('CREATE TABLE IF NOT EXISTS punishments (guild TEXT NOT NULL, user TEXT NOT NULL, type TEXT, issuer TEXT NOT NULL, unixFinish TEXT NOT NULL)').run();
   }
@@ -70,44 +67,6 @@ module.exports = class db {
       catch(err) {
         reject(err);
       }
-    });
-  }
-
-  // # Guild
-  getGuild(guild) {
-    return new Promise((resolve, reject) => {
-      try {
-        const guildData = this.db.prepare('SELECT * FROM guilds WHERE guild = ?').get(guild);
-        resolve(guildData);
-      }
-      catch(err) {
-        reject(err);
-      }
-    });
-  }
-
-  setGuildSetting(guild, type, value) {
-    return new Promise((resolve, reject) => {
-      this.getGuild(guild)
-      .then(data => {
-        console.dir(data);
-        try {
-          if (data === undefined && type === 'rAdmin') {
-            const guildPrep = this.db.prepare('INSERT INTO guilds (guild, rAdmin) VALUES (?, ?)');
-            const guildRun = guildPrep.run(guild, value);
-            resolve(guildRun.changes);
-          }
-          else {
-            const guildPrep = this.db.prepare(`UPDATE guilds SET ${type} = ? WHERE guild = ?`);
-            const guildRun = guildPrep.run(value, guild);
-            resolve(guildRun.changes);
-          }
-        }
-        catch(err) {
-          reject(err);
-        }
-      })
-      .catch(reject);
     });
   }
 };

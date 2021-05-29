@@ -32,12 +32,13 @@ catch(err) {
   process.exit(0);
 }
 
+const path = require('path');
+const fs = require('fs');
 const { Client, Intents } = require('discord.js');
 exports.client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 exports.commands = {};
 exports.logs = require('./common/logs');
-const path = require('path');
-const fs = require('fs');
+process.servers = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json'))).servers;
 require('./common/events');
 require('dotenv').config();
 
@@ -55,5 +56,18 @@ require('dotenv').config();
     }
   });
 })();
+
+// # Servers Config File Changes
+fs.watchFile(path.join(__dirname, './servers.json'), () => {
+  try {
+    const newFile = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json')));
+    process.servers = newFile.servers;
+    this.logs('servers', 'Server config updated from servers.json');
+  }
+  catch(err) {
+    console.error(err);
+    this.logs('error', 'Failed to load the updated server.json config! Using previous changes...');
+  }
+});
 
 this.client.login(process.env.TOKEN);
