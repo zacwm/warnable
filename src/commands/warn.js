@@ -43,19 +43,22 @@ exports.interaction = async (interaction) => {
             interaction.user.id,
             interaction.options[2].value,
           )
-          .then((v) => {
+          .then(async (v) => {
             if (v) {
-              const embedMessage = new MessageEmbed()
-              .setTitle('Warning added!')
-              .setDescription(`**Warned:** <@${interaction.options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].value.match(/\d+/g)[0]})`
-              + `\n**Points:** ${interaction.options[1].value} point${interaction.options[1].value !== 1 ? 's' : ''}`
-              + `\n**Reason:** \`${interaction.options[2].value ? interaction.options[2].value : 'No reason provied.'}\``);
-              interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+              const newList = await db.listWarnings(interaction.guildID, interaction.options[0].value.match(/\d+/g)[0]);
+              interaction.reply({ embeds: [
+                new MessageEmbed()
+                .setTitle('Warning added!')
+                .setDescription(`**Warned:** <@${interaction.options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].value.match(/\d+/g)[0]})`
+                + `\n**Points:** ${interaction.options[1].value} point${interaction.options[1].value !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
+                + `\n**Reason:** \`${interaction.options[2].value ? interaction.options[2].value : 'No reason provied.'}\``),
+              ], ephemeral: true });
             }
             else {
-              const embedMessage = new MessageEmbed()
-              .setDescription('The warning couldn\'t be applied.');
-              interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+              interaction.reply({ embeds: [
+                new MessageEmbed()
+                .setDescription('The warning couldn\'t be applied.'),
+              ], ephemeral: true });
             }
           }).catch(vErr => {
             console.error(vErr);

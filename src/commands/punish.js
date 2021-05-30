@@ -63,6 +63,11 @@ exports.meta = {
           description: 'The member to stop the punishment. Can be a @mention or ID',
           required: true,
         },
+        {
+          name: 'reason',
+          type: 'STRING',
+          description: 'The reason you stopped the punishment.',
+        },
       ],
     },
   ],
@@ -71,14 +76,26 @@ exports.meta = {
 exports.interaction = async (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    console.dir(interaction);
     if (interaction.options[0].name === 'list') {
       db.listPunishments(interaction.guildID)
       .then(p => {
         if (p.length > 0) {
-          const embedMessage = new MessageEmbed()
-          .setDescription(`There are ${p.length} active punishments.`);
-          interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+          p.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
+          const arrayChunks = Array(Math.ceil(p.length / 5)).fill().map((_, index) => index * 5).map(begin => p.slice(begin, begin + 5));
+          const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
+          if (page > -1 && arrayChunks.length > page) {
+            const embedMessage = new MessageEmbed()
+            .setTitle(`Active server punishments | Total: ${p.length}`)
+            .setDescription(`${arrayChunks[page].map((punish) => `<@${punish.user}> | ${parseInt(punish.unixFinish) > 0 ? 'Temp-' : ''}${punish.type}\n└  Issuer: <@${punish.issuer}> | Finish time: ${moment.unix(punish.unixFinish).utc().tz('Australia/Brisbane').format('MMMM Do YYYY, h:mm a')}`).join('\n')}`)
+            .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : '');
+            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+          }
+          else {
+            interaction.reply({ embeds: [
+              new MessageEmbed()
+              .setDescription('Invalid page number.'),
+            ], ephemeral: true });
+          }
         }
         else {
           const embedMessage = new MessageEmbed()
@@ -98,7 +115,7 @@ exports.interaction = async (interaction) => {
         const user = interaction.options[0].options[0].value.match(/\d+/g)[0];
         const type = interaction.options[0].options[1].value.replace('punish_', '');
         const length = type !== 'kick' ? (interaction.options[0].options[2] ? moment().add(parseInt(interaction.options[0].options[2].value.match(/\d+/g)[0]), interaction.options[0].options[2].value.match(/\D/g)[0]) : undefined) : undefined;
-        punishments.execute(interaction.guildID, user, type, `[punish] ${length ? 'temp-' : ''}${type} started by ${interaction.user.tag}. Their punishment will finish ${length ? moment().to(length) : 'NEVER.'}`)
+        punishments.execute(interaction.guildID, user, type, interaction.user.id, length ? moment(length).unix() : 0, `[punish] ${length ? 'temp-' : ''}${type} started by ${interaction.user.tag}. Their punishment will finish ${length ? moment().to(length) : 'NEVER.'}`)
         .then((pRes) => {
           if (pRes) {
             const embedMessage = new MessageEmbed()
@@ -128,10 +145,23 @@ exports.interaction = async (interaction) => {
       }
     }
     else if (interaction.options[0].name === 'stop') {
-      console.dir(interaction.options[0]);
-      const embedMessage = new MessageEmbed()
-      .setDescription('\\//');
-      interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+      punishments.stop(
+        interaction.guildID,
+        interaction.options[0].options[0].value.match(/\d+/g)[0],
+        interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.',
+      )
+      .then(() => {
+        interaction.reply({ embeds: [
+          new MessageEmbed()
+          .setDescription('The punishment was stopped!'),
+        ], ephemeral: true });
+      })
+      .catch((rErr) => {
+        interaction.reply({ embeds: [
+          new MessageEmbed()
+          .setDescription(`An error occured trying to stop the punishment...\n\`\`\`\n${rErr.reason}\n\`\`\``),
+        ], ephemeral: true });
+      });
     }
   }
 };

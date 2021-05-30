@@ -1,24 +1,21 @@
-// # warnable v3-dev | Command
-
 const { MessageEmbed } = require('discord.js');
 const { db } = require('../warnable');
-const moment = require('moment-timezone');
 
 exports.meta = {
-  name: 'list',
-  description: 'Displays a list of the members warnings.',
+  name: 'unwarn',
+  description: 'Removes a warning from a member.',
   options: [
     {
       name: 'user',
       type: 'STRING',
-      description: 'The member to list. | @mention or ID',
+      description: 'The user to warn | @mention or ID',
       required: true,
     },
     {
-      name: 'page',
+      name: 'number',
       type: 'INTEGER',
-      description: 'View another page of the members warnings.',
-      required: false,
+      description: 'The number warning that is shown in the list to remove.',
+      required: true,
     },
   ],
 };
@@ -29,35 +26,44 @@ exports.interaction = async (interaction) => {
     const serverConfig = process.servers[interaction.guildID];
     if (serverConfig) {
       const member = await interaction.member.fetch();
-      if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
+      if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
         if (interaction.options[0].value.match(/\d+/g)) {
           db.listWarnings(
             interaction.guildID,
             interaction.options[0].value.match(/\d+/g)[0],
           )
           .then((v) => {
-            if (v.length > 0) {
-              v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
-              const arrayChunks = Array(Math.ceil(v.length / 5)).fill().map((_, index) => index * 5).map(begin => v.slice(begin, begin + 5));
-              const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
-              if (page > -1 && arrayChunks.length > page) {
-                const embedMessage = new MessageEmbed()
-                .setTitle(`Warnings for ${v[0].user} | Total points: ${v.reduce((prev, val) => prev + val.points, 0)}`)
-                .setDescription(`${arrayChunks[page].map((warning, index) => `**${(page * 5) + (index + 1)}) ${warning.reason}**\n└  ‎Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.unixTime) ? moment.unix(warning.unixTime).utc().tz('Australia/Brisbane').format('MMMM Do YYYY, h:mm a') : 'Unknown'}`).join('\n\n')}`)
-                .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : '');
-                interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-              }
-              else {
+            v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
+            const warningNum = parseInt(interaction.options[1].value);
+            if (warningNum > 0 && v.length >= warningNum) {
+              /*
+               * Heads up to whoever is looking at this :----------)
+               * I know.... It could've been done by giving each warning it's own UID,
+               * but using the sort and unixTime is close enough imo lol, less work for me, the db, and the user kinda...
+               */
+              db.removeWarning(
+                interaction.guildID,
+                interaction.options[0].value.match(/\d+/g)[0],
+                v[warningNum - 1].unixTime,
+              )
+              .then(() => {
                 interaction.reply({ embeds: [
                   new MessageEmbed()
-                  .setDescription('Invalid page number.'),
+                  .setDescription('Warning deleted!'),
                 ], ephemeral: true });
-              }
+              })
+              .catch((qErr) => {
+                console.error(qErr);
+                interaction.reply({ embeds: [
+                  new MessageEmbed()
+                  .setDescription('Something failed.'),
+                ], ephemeral: true });
+              });
             }
             else {
               interaction.reply({ embeds: [
                 new MessageEmbed()
-                .setDescription('No warnings to show for this member!'),
+                .setDescription('No warning is at that position.'),
               ], ephemeral: true });
             }
           }).catch((vErr) => {

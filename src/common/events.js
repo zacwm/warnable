@@ -21,6 +21,12 @@ client.on('ready', async () => {
     }
   }
 
+  setInterval(() => {
+    Object.keys(process.servers).map((server) => {
+      punishments.check(server);
+    });
+  }, 10000);
+
   const appCommands = await client.application.commands.set(cmdData);
   logs('command', `${appCommands.size} application commands applied! `);
   appCommands.forEach((cmd) => {
@@ -33,7 +39,7 @@ client.on('message', (msg) => {
 });
 
 client.on('guildMemberAdd', (member) => {
-  //punishments.rejoin(member.guild.id, member.user.id);
+  punishments.rejoin(member.guild.id, member.user.id);
   cmdEvent('guildMemberAdd', (member));
 });
 
