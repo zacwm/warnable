@@ -36,28 +36,30 @@ exports.interaction = async (interaction) => {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
         if (interaction.options[0].value.match(/\d+/g)) {
-          db.addWarning(
-            interaction.guildID,
-            interaction.options[0].value.match(/\d+/g)[0],
-            interaction.options[1].value,
-            interaction.user.id,
-            interaction.options[2].value,
-          )
+          const wGuildID = interaction.guildID;
+          const wUserID = interaction.options[0].value.match(/\d+/g);
+          const wPoints = parseInt(interaction.options[1].value);
+          const wIssuerID = interaction.user.id;
+          const wReason = interaction.options[2] ? interaction.options[2].value : 'No reason provied.';
+
+          db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason)
           .then(async (v) => {
             if (v) {
-              const newList = await db.listWarnings(interaction.guildID, interaction.options[0].value.match(/\d+/g)[0]);
-              const descString = `**Warned:** <@${interaction.options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].value.match(/\d+/g)[0]})`
-              + `\n**Points:** ${interaction.options[1].value} point${interaction.options[1].value !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
-              + `\n**Reason:** \`${interaction.options[2].value ? interaction.options[2].value : 'No reason provied.'}\``;
+              const newList = await db.listWarnings(wGuildID, wUserID);
+              const descString = `**Warned:** <@${wUserID}> (${wUserID})`
+              + `\n**Points:** ${wPoints} point${wPoints !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
+              + `\n**Reason:** \`${wReason}\``;
 
               logs.guild(interaction.guildID, 'main', {
                 title: 'New warning',
-                description: descString + `\n**Issuer:** <@${interaction.user.id}>`,
+                description: descString + `\n**Issuer:** <@${wIssuerID}>`,
+                color: 0xe67e22,
               });
               interaction.reply({ embeds: [
                 new MessageEmbed()
                 .setTitle('Warning added!')
-                .setDescription(descString),
+                .setDescription(descString)
+                .setColor(0xe67e22),
               ], ephemeral: true });
             }
             else {
