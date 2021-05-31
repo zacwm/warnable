@@ -18,6 +18,7 @@ async function runEvent(event, args) {
     if (!client.application.owner) await client.application.fetch();
     logs.console('event', `Logged in and ready as '${client.user.tag}'`);
     const cmdData = [];
+
     for(const command in commands) {
       if (commands[command]['meta']) cmdData.push(commands[command].meta);
     }
@@ -28,10 +29,9 @@ async function runEvent(event, args) {
       logs.console('command', `Intention ID: ${cmd.id} | Name: ${cmd.name} (${cmd.description})`);
     });
 
+    // Punishment interval check
     setInterval(() => {
-      Object.keys(process.servers).map((server) => {
-        punishments.check(server);
-      });
+      Object.keys(process.servers).map((server) => { punishments.check(server); });
     }, 10000);
   }
 

@@ -73,6 +73,10 @@ exports.meta = {
   ],
 };
 
+exports.guildMemberAdd = (member) => {
+  punishments.rejoin(member.guild.id, member.user.id);
+};
+
 exports.interaction = async (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
