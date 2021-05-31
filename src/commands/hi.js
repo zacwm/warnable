@@ -15,16 +15,18 @@ exports.interaction = (interaction) => {
     fetch('http://aws.random.cat/meow')
     .then(res => res.json())
     .then(json => {
-      const embedMessage = new MessageEmbed()
-      .setTitle('Hello! :)')
-      .setDescription('Here\'s a cat...')
-      .setImage(json.file);
-      interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+      interaction.reply({ embeds: [
+        new MessageEmbed()
+        .setTitle('Hello! :)')
+        .setDescription('Here\'s a cat...')
+        .setImage(json.file),
+      ] });
     })
     .catch(() => {
-      const embedMessage = new MessageEmbed()
-      .setDescription('Hello! :)');
-      interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+      interaction.reply({ embeds: [
+        new MessageEmbed()
+        .setDescription('Hello! :)'),
+      ] });
     });
   }
 };

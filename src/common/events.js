@@ -6,7 +6,7 @@ const punishments = require('./punishments');
 
 client.on('ready', async () => {
   if (!client.application.owner) await client.application.fetch();
-  logs('event', `Logged in and ready as '${client.user.tag}'`);
+  logs.console('event', `Logged in and ready as '${client.user.tag}'`);
   const cmdData = [];
 
   for(const command in commands) {
@@ -17,21 +17,21 @@ client.on('ready', async () => {
       }
     }
     catch(e) {
-      logs('error', `Event error on 'ready' by '${command}'`);
+      logs.console('error', `Event error on 'ready' by '${command}'`);
     }
   }
+
+  const appCommands = await client.application.commands.set(cmdData);
+  logs.console('command', `${appCommands.size} application commands applied! `);
+  appCommands.forEach((cmd) => {
+    logs.console('command', `Intention ID: ${cmd.id} | Name: ${cmd.name} (${cmd.description})`);
+  });
 
   setInterval(() => {
     Object.keys(process.servers).map((server) => {
       punishments.check(server);
     });
   }, 10000);
-
-  const appCommands = await client.application.commands.set(cmdData);
-  logs('command', `${appCommands.size} application commands applied! `);
-  appCommands.forEach((cmd) => {
-    logs('command', `Intention ID: ${cmd.id} | Name: ${cmd.name} (${cmd.description})`);
-  });
 });
 
 client.on('message', (msg) => {
@@ -45,7 +45,7 @@ client.on('guildMemberAdd', (member) => {
 
 client.on('interaction', async interaction => {
   cmdEvent('interaction', (interaction));
-  logs('event', `Interaction ${interaction.isCommand() ? `'${interaction.commandName}'` : ''} run by ${interaction.user.tag} (${interaction.user.id})`);
+  logs.console('event', `Interaction ${interaction.isCommand() ? `'${interaction.commandName}'` : ''} run by ${interaction.user.tag} (${interaction.user.id})`);
 });
 
 function cmdEvent(event, vals) {
@@ -54,7 +54,7 @@ function cmdEvent(event, vals) {
       if (commands[command][event]) commands[command][event](vals);
     }
     catch(e) {
-      logs('error', `Event error on '${event}' by '${command}'`);
+      logs.console('error', `Event error on '${event}' by '${command}'`);
     }
   }
 }

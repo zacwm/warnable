@@ -41,11 +41,12 @@ exports.interaction = async (interaction) => {
               const arrayChunks = Array(Math.ceil(v.length / 5)).fill().map((_, index) => index * 5).map(begin => v.slice(begin, begin + 5));
               const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
               if (page > -1 && arrayChunks.length > page) {
-                const embedMessage = new MessageEmbed()
-                .setTitle(`Warnings for ${v[0].user} | Total points: ${v.reduce((prev, val) => prev + val.points, 0)}`)
-                .setDescription(`${arrayChunks[page].map((warning, index) => `**${(page * 5) + (index + 1)}) ${warning.reason}**\n└  ‎Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.unixTime) ? moment.unix(warning.unixTime).utc().tz('Australia/Brisbane').format('MMMM Do YYYY, h:mm a') : 'Unknown'}`).join('\n\n')}`)
-                .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : '');
-                interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+                interaction.reply({ embeds: [
+                  new MessageEmbed()
+                  .setTitle(`Warnings for ${v[0].user} | Total points: ${v.reduce((prev, val) => prev + val.points, 0)}`)
+                  .setDescription(`${arrayChunks[page].map((warning, index) => `**${(page * 5) + (index + 1)}) ${warning.reason}**\n└  ‎Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.unixTime) ? moment.unix(warning.unixTime).utc().tz('Australia/Brisbane').format('MMMM Do YYYY, h:mm a') : 'Unknown'}`).join('\n\n')}`)
+                  .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : ''),
+                ], ephemeral: true });
               }
               else {
                 interaction.reply({ embeds: [

@@ -12,8 +12,76 @@
         "mute": "670260841144254476"
       },
 
-      "channels": {
-        "warnings": "",
+      "log-channels": {
+        "main": "848828371197493269",
+        "users": "",
+        "messages": "1"
+      },
+
+      "point-punishments": [
+        {
+          "action": { "type": "mute", "length": "1d" },
+          "range": { "min": 5, "max": 9 },
+          "direct-message": "**Hey you!**\nYou have reached 5+ warning points and have been muted for one day.\nPlease read over our rules."
+        },
+        {
+          "action": { "type": "ban", "length": "1w" },
+          "range": { "min": 10, "max": 14 },
+          "direct-message": "**Bro...**\nYou have reached 10+ warning points and have been banned for one week.\nPlease read over our rules when rejoining."
+        },
+        {
+          "action": { "type": "ban", "length": "" },
+          "range": { "min": 15, "max": -1 },
+          "direct-message": "**Oh no!**\nYou have reached 15+ warning points, therefore you have been permanently banned from our server."
+        }
+      ]
+    },
+
+    "794795212714409995": {
+      "roles": {
+        "admin": "794849144165629973",
+        "moderator": "",
+        "viewer": "",
+        "immune": "",
+        "mute": ""
+      },
+
+      "log-channels": {
+        "main": "",
+        "users": "",
+        "messages": "1"
+      },
+
+      "point-punishments": [
+        {
+          "action": { "type": "mute", "length": "1d" },
+          "range": { "min": 5, "max": 9 },
+          "direct-message": "**Hey you!**\nYou have reached 5+ warning points and have been muted for one day.\nPlease read over our rules."
+        },
+        {
+          "action": { "type": "ban", "length": "1w" },
+          "range": { "min": 10, "max": 14 },
+          "direct-message": "**Bro...**\nYou have reached 10+ warning points and have been banned for one week.\nPlease read over our rules when rejoining."
+        },
+        {
+          "action": { "type": "ban", "length": "" },
+          "range": { "min": 15, "max": -1 },
+          "direct-message": "**Oh no!**\nYou have reached 15+ warning points, therefore you have been permanently banned from our server."
+        }
+      ]
+    },
+
+    "743969419528765500": {
+      "roles": {
+        "admin": "743970933798076447",
+        "moderator": "",
+        "viewer": "",
+        "immune": "",
+        "mute": ""
+      },
+
+      "log-channels": {
+        "main": "848862224650207232",
         "users": "",
         "messages": "1"
       },

@@ -83,7 +83,7 @@ exports.rejoin = ((guild, user) => {
   })
   .catch((pErr) => {
     console.error(pErr);
-    logs('check', `Failed to perform a rejoin check on '${user}' in '${guild}'`);
+    logs.console('check', `Failed to perform a rejoin check on '${user}' in '${guild}'`);
   });
 });
 
@@ -156,6 +156,6 @@ exports.check = ((guild) => {
   })
   .catch((pErr) => {
     console.error(pErr);
-    logs('check', `Failed to perform a time check for '${guild}' when using db.listPunishments`);
+    logs.console('check', `Failed to perform a time check for '${guild}' when using db.listPunishments`);
   });
 });

@@ -1,7 +1,7 @@
 // # warnable v3-dev | Command
 
 const { MessageEmbed } = require('discord.js');
-const { db } = require('../warnable');
+const { db, logs } = require('../warnable');
 
 exports.meta = {
   name: 'warn',
@@ -46,12 +46,18 @@ exports.interaction = async (interaction) => {
           .then(async (v) => {
             if (v) {
               const newList = await db.listWarnings(interaction.guildID, interaction.options[0].value.match(/\d+/g)[0]);
+              const descString = `**Warned:** <@${interaction.options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].value.match(/\d+/g)[0]})`
+              + `\n**Points:** ${interaction.options[1].value} point${interaction.options[1].value !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
+              + `\n**Reason:** \`${interaction.options[2].value ? interaction.options[2].value : 'No reason provied.'}\``;
+
+              logs.guild(interaction.guildID, 'main', {
+                title: 'New warning',
+                description: descString + `\n**Issuer:** <@${interaction.user.id}>`,
+              });
               interaction.reply({ embeds: [
                 new MessageEmbed()
                 .setTitle('Warning added!')
-                .setDescription(`**Warned:** <@${interaction.options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].value.match(/\d+/g)[0]})`
-                + `\n**Points:** ${interaction.options[1].value} point${interaction.options[1].value !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
-                + `\n**Reason:** \`${interaction.options[2].value ? interaction.options[2].value : 'No reason provied.'}\``),
+                .setDescription(descString),
               ], ephemeral: true });
             }
             else {

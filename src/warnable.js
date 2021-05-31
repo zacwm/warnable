@@ -48,10 +48,10 @@ require('dotenv').config();
     try {
       if (!file.endsWith('.js')) return;
       this.commands[file] = require(path.join(__dirname, './commands', file));
-      this.logs('command', `Command loaded ${file}`);
+      this.logs.console('command', `Command loaded ${file}`);
     }
     catch(err) {
-      this.logs('error', `Error thrown trying to load command file '${file}'`);
+      this.logs.console('error', `Error thrown trying to load command file '${file}'`);
       console.error(err);
     }
   });
@@ -62,11 +62,11 @@ fs.watchFile(path.join(__dirname, './servers.json'), () => {
   try {
     const newFile = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json')));
     process.servers = newFile.servers;
-    this.logs('servers', 'Server config updated from servers.json');
+    this.logs.console('servers', 'Server config updated from servers.json');
   }
   catch(err) {
     console.error(err);
-    this.logs('error', 'Failed to load the updated server.json config! Using previous changes...');
+    this.logs.console('error', 'Failed to load the updated server.json config! Using previous changes...');
   }
 });
 
