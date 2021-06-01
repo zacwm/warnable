@@ -36,7 +36,7 @@ async function runEvent(event, args) {
   }
 
   if (event === 'interaction') {
-    logs.console('command', `Interaction${args[0].isCommand() ? `' ${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
+    logs.console('command', `Interaction${args[0].isCommand() ? ` '${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
   }
 
   // Command file events...
