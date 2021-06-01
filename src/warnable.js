@@ -44,7 +44,7 @@ require('dotenv').config();
 
 // # Load warnable modules
 (() => {
-  fs.readdirSync(path.join(__dirname, './commands')).forEach(file => {
+  fs.readdirSync(path.join(__dirname, './modules')).forEach(file => {
     try {
       if (!file.endsWith('.js')) return;
       this.modules[file] = require(path.join(__dirname, './modules', file));
