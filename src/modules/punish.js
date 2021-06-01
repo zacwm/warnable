@@ -1,6 +1,6 @@
 // # warnable v3-dev | Command
 
-const { db } = require('../warnable');
+const { db, logs } = require('../warnable');
 const { MessageEmbed } = require('discord.js');
 const punishments = require('../common/punishments');
 const moment = require('moment-timezone');
@@ -155,6 +155,12 @@ exports.interaction = async (interaction) => {
         interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.',
       )
       .then(() => {
+        logs.guild(interaction.guildID, 'main', {
+          title: 'Punishment stopped',
+          description: `The punishment for <@${interaction.options[0].options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].options[0].value.match(/\d+/g)[0]}) was stopped by <@${interaction.user.id}>`
+          + `\n**Reason:** \`${interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.'}\``,
+          color: 0x1abc9c,
+        });
         interaction.reply({ embeds: [
           new MessageEmbed()
           .setDescription('The punishment was stopped!'),

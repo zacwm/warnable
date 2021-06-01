@@ -163,11 +163,21 @@ exports.stop = (guild, user, reason) => {
 exports.check = (guild) => {
   db.listPunishments(guild)
   .then((p) => {
+    const finishedPunishments = {};
     p.forEach((punishment) => {
-      if (parseInt(punishment.unixFinish) <= moment().unix()) {
+      if (parseInt(punishment.unixFinish) > 0 && parseInt(punishment.unixFinish) <= moment().unix()) {
+        if (!finishedPunishments[punishment.guild]) finishedPunishments[punishment.guild] = [];
+        finishedPunishments[punishment.guild].push(`- <@${punishment.user}> (${punishment.user}) | ${punishment.type}`);
         this.stop(punishment.guild, punishment.user, '[punish] Temp-timer concluded.');
       }
     });
+    for (const server in finishedPunishments) {
+      logs.guild(server, 'main', {
+        title: `Punishment${finishedPunishments[server].length > 1 ? 's' : ''} finished`,
+        description: finishedPunishments[server].join('\n'),
+        color: 0x1abc9c,
+      });
+    }
   })
   .catch((pErr) => {
     console.error(pErr);
