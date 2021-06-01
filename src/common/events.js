@@ -1,7 +1,7 @@
 // # Warnable v3 | Common - Events
 // Handles events recieved from Discord.
 
-const { client, commands, logs } = require('../warnable');
+const { client, modules, logs } = require('../warnable');
 const punishments = require('./punishments');
 
 const events = ['ready', 'message', 'interaction', 'guildMemberAdd'];
@@ -19,8 +19,8 @@ async function runEvent(event, args) {
     logs.console('event', `Logged in and ready as '${client.user.tag}'`);
     const cmdData = [];
 
-    for(const command in commands) {
-      if (commands[command]['meta']) cmdData.push(commands[command].meta);
+    for(const module in modules) {
+      if (modules[module]['meta']) cmdData.push(modules[module].meta);
     }
 
     const appCommands = await client.application.commands.set(cmdData);
@@ -36,11 +36,11 @@ async function runEvent(event, args) {
   }
 
   if (event === 'interaction') {
-    logs.console('command', `Interaction ${args[0].isCommand() ? `'${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
+    logs.console('command', `Interaction${args[0].isCommand() ? `' ${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
   }
 
   // Command file events...
-  for(const command in commands) {
-    if (commands[command][event]) commands[command][event](...args);
+  for(const module in modules) {
+    if (modules[module][event]) modules[module][event](...args);
   }
 }

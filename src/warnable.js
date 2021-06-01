@@ -36,22 +36,22 @@ const path = require('path');
 const fs = require('fs');
 const { Client, Intents } = require('discord.js');
 exports.client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS] });
-exports.commands = {};
+exports.modules = {};
 exports.logs = require('./common/logs');
 process.servers = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json'))).servers;
 require('./common/events');
 require('dotenv').config();
 
-// # Load commands
+// # Load warnable modules
 (() => {
   fs.readdirSync(path.join(__dirname, './commands')).forEach(file => {
     try {
       if (!file.endsWith('.js')) return;
-      this.commands[file] = require(path.join(__dirname, './commands', file));
-      this.logs.console('command', `Command loaded ${file}`);
+      this.modules[file] = require(path.join(__dirname, './modules', file));
+      this.logs.console('module', `Module loaded ${file}`);
     }
     catch(err) {
-      this.logs.console('error', `Error thrown trying to load command file '${file}'`);
+      this.logs.console('error', `Error thrown trying to load module '${file}'`);
       console.error(err);
     }
   });
