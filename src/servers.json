@@ -8,7 +8,7 @@
         "admin": "670260171980800010",
         "moderator": "",
         "viewer": "",
-        "immune": "",
+        "immune": "693286091637391401",
         "mute": "670260841144254476"
       },
 
@@ -18,38 +18,17 @@
         "messages": "1"
       },
 
-      "point-punishments": [
-        {
-          "action": { "type": "mute", "length": "1d" },
-          "range": { "min": 5, "max": 9 },
-          "direct-message": "**Hey you!**\nYou have reached 5+ warning points and have been muted for one day.\nPlease read over our rules."
+      "automod": {
+        "badwords": {
+          "enabled": false,
+          "excluded": [],
+          "points": 1
         },
-        {
-          "action": { "type": "ban", "length": "1w" },
-          "range": { "min": 10, "max": 14 },
-          "direct-message": "**Bro...**\nYou have reached 10+ warning points and have been banned for one week.\nPlease read over our rules when rejoining."
-        },
-        {
-          "action": { "type": "ban", "length": "" },
-          "range": { "min": 15, "max": -1 },
-          "direct-message": "**Oh no!**\nYou have reached 15+ warning points, therefore you have been permanently banned from our server."
+        "invites": {
+          "enabled": false,
+          "excluded": [],
+          "points": 2
         }
-      ]
-    },
-
-    "794795212714409995": {
-      "roles": {
-        "admin": "794849144165629973",
-        "moderator": "",
-        "viewer": "",
-        "immune": "",
-        "mute": ""
-      },
-
-      "log-channels": {
-        "main": "",
-        "users": "",
-        "messages": "1"
       },
 
       "point-punishments": [
@@ -84,6 +63,19 @@
         "main": "848862224650207232",
         "users": "",
         "messages": "1"
+      },
+
+      "automod": {
+        "badwords": {
+          "enabled": false,
+          "excluded": [],
+          "points": 1
+        },
+        "invites": {
+          "enabled": true,
+          "excluded": [],
+          "points": 1
+        }
       },
 
       "point-punishments": [
