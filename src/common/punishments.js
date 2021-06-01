@@ -19,7 +19,8 @@ exports.execute = (guildID, userID, punishmentType, issuer, unix, reason) => {
       .then(() => {
         logs.guild(guildID, 'main', {
           title: 'Punishment started',
-          description: `**Finishes:** ${(parseInt(unix) !== 0) ? moment().to(moment.unix(parseInt(unix))) : 'never...'}`
+          description: `**User:** <@${userID}> (${userID})`
+          + `\n**Finishes:** ${(parseInt(unix) !== 0) ? moment().to(moment.unix(parseInt(unix))) : 'never...'}`
           + `\n**Type:** ${punishmentType} **| Issuer:** <@${issuer}>`
           + `\n**Reason:** \`${reason}\``,
           color: 0xe74c3c,
