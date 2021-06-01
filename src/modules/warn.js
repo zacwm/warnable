@@ -2,6 +2,7 @@
 
 const { MessageEmbed } = require('discord.js');
 const { db, logs } = require('../warnable');
+const { pointCheck } = require('../common/punishments');
 
 exports.meta = {
   name: 'warn',
@@ -37,7 +38,7 @@ exports.interaction = async (interaction) => {
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
         if (interaction.options[0].value.match(/\d+/g)) {
           const wGuildID = interaction.guildID;
-          const wUserID = interaction.options[0].value.match(/\d+/g);
+          const wUserID = interaction.options[0].value.match(/\d+/g)[0];
           const wPoints = parseInt(interaction.options[1].value);
           const wIssuerID = interaction.user.id;
           const wReason = interaction.options[2] ? interaction.options[2].value : 'No reason provied.';
@@ -46,20 +47,23 @@ exports.interaction = async (interaction) => {
           .then(async (v) => {
             if (v) {
               const newList = await db.listWarnings(wGuildID, wUserID);
+              const pointTotal = newList.reduce((prev, val) => prev + val.points, 0);
               const descString = `**Warned:** <@${wUserID}> (${wUserID})`
-              + `\n**Points:** ${wPoints} point${wPoints !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
+              + `\n**Points:** ${wPoints} point${wPoints !== 1 ? 's' : ''} (New total: ${pointTotal || '?'})`
               + `\n**Reason:** \`${wReason}\``;
+
+              if (pointTotal) pointCheck(wGuildID, wUserID, pointTotal, wIssuerID);
 
               logs.guild(interaction.guildID, 'main', {
                 title: 'New warning',
                 description: descString + `\n**Issuer:** <@${wIssuerID}>`,
-                color: 0xe67e22,
+                color: 0xf39c12,
               });
               interaction.reply({ embeds: [
                 new MessageEmbed()
                 .setTitle('Warning added!')
                 .setDescription(descString)
-                .setColor(0xe67e22),
+                .setColor(0xf39c12),
               ], ephemeral: true });
             }
             else {

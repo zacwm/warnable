@@ -72,7 +72,7 @@
           "points": 1
         },
         "invites": {
-          "enabled": true,
+          "enabled": false,
           "excluded": [],
           "points": 1
         }

@@ -5,7 +5,7 @@
 const { db, logs, client } = require('../warnable');
 const moment = require('moment-timezone');
 
-exports.execute = ((guildID, userID, punishmentType, issuer, unix, reason) => {
+exports.execute = (guildID, userID, punishmentType, issuer, unix, reason) => {
   return new Promise((resolve, reject) => {
     const serverConfig = process.servers[guildID];
     if (serverConfig) {
@@ -17,10 +17,20 @@ exports.execute = ((guildID, userID, punishmentType, issuer, unix, reason) => {
         unix,
       )
       .then(() => {
+        logs.guild(guildID, 'main', {
+          title: 'Punishment started',
+          description: `**Finishes:** ${(parseInt(unix) !== 0) ? moment().to(moment.unix(parseInt(unix))) : 'never...'}`
+          + `\n**Type:** ${punishmentType} **| Issuer:** <@${issuer}>`
+          + `\n**Reason:** \`${reason}\``,
+          color: 0xe74c3c,
+        });
+
         client.guilds.fetch(guildID)
         .then((g) => {
           g.members.fetch(userID)
           .then(member => {
+
+            // MUTE
             if (punishmentType === 'mute') {
               if (serverConfig.roles.mute) {
                 member.roles.add(serverConfig.roles.mute, reason)
@@ -35,6 +45,8 @@ exports.execute = ((guildID, userID, punishmentType, issuer, unix, reason) => {
                 reject({ reason: 'No mute role is configured for this server.' });
               }
             }
+
+            // BAN
             else if (punishmentType === 'ban') {
               member.ban({ reason: reason })
               .then((r) => {
@@ -44,6 +56,8 @@ exports.execute = ((guildID, userID, punishmentType, issuer, unix, reason) => {
                 reject({ reason: 'Something failed when trying to ban the member.', catch: rErr });
               });
             }
+
+            // KICK
             else if (punishmentType === 'kick') {
               member.kick(reason)
               .then((r) => {
@@ -56,6 +70,7 @@ exports.execute = ((guildID, userID, punishmentType, issuer, unix, reason) => {
             else {
               reject(null);
             }
+
           })
           .catch((mErr) => {
             reject({ reason: 'Something failed when trying to lookup the member.', catch: mErr });
@@ -73,9 +88,9 @@ exports.execute = ((guildID, userID, punishmentType, issuer, unix, reason) => {
       reject({ reason: 'The server isn\'t configured.' });
     }
   });
-});
+};
 
-exports.rejoin = ((guild, user) => {
+exports.rejoin = (guild, user) => {
   db.listPunishments(guild)
   .then((p) => {
     const punishment = p.find(punish => punish.user === user);
@@ -85,9 +100,9 @@ exports.rejoin = ((guild, user) => {
     console.error(pErr);
     logs.console('check', `Failed to perform a rejoin check on '${user}' in '${guild}'`);
   });
-});
+};
 
-exports.stop = ((guild, user, reason) => {
+exports.stop = (guild, user, reason) => {
   return new Promise((resolve, reject) => {
     const serverConfig = process.servers[guild];
     if (serverConfig) {
@@ -143,9 +158,9 @@ exports.stop = ((guild, user, reason) => {
       reject({ reason: 'This server isn\'t configured.' });
     }
   });
-});
+};
 
-exports.check = ((guild) => {
+exports.check = (guild) => {
   db.listPunishments(guild)
   .then((p) => {
     p.forEach((punishment) => {
@@ -158,4 +173,17 @@ exports.check = ((guild) => {
     console.error(pErr);
     logs.console('check', `Failed to perform a time check for '${guild}' when using db.listPunishments`);
   });
-});
+};
+
+exports.pointCheck = (guildID, userID, points, issuer) => {
+  const serverConfig = process.servers[guildID];
+  if (serverConfig) {
+    serverConfig['point-punishments'].every((item) => {
+      if (item.range.min <= points && item.range.max >= points) {
+        const length = moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix();
+        this.execute(guildID, userID, item.action.type, issuer, length, '[warnable] Point checkpoint reached');
+        return;
+      }
+    });
+  }
+};
