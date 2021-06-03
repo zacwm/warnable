@@ -42,8 +42,9 @@ exports.interaction = async (interaction) => {
           const wPoints = parseInt(interaction.options[1].value);
           const wIssuerID = interaction.user.id;
           const wReason = interaction.options[2] ? interaction.options[2].value : 'No reason provied.';
+          const wTime = (new Date(new Date().toUTCString()).getTime() / 1000).toString();
 
-          db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason)
+          db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason, wTime)
           .then(async (v) => {
             if (v) {
               const newList = await db.listWarnings(wGuildID, wUserID);

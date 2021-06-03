@@ -19,11 +19,11 @@ module.exports = class db {
   }
 
   // # Warnings
-  addWarning(guild, user, points, issuer, reason) {
+  addWarning(guild, user, points, issuer, reason, time) {
     return new Promise((resolve, reject) => {
       try {
         const warningPrep = this.db.prepare('INSERT INTO warnings (guild, user, points, issuer, reason, unixTime) VALUES (?, ?, ?, ?, ?, ?)');
-        const warningExec = warningPrep.run(guild, user, parseInt(points), issuer, (reason || 'No reason provided.'), (new Date(new Date().toUTCString()).getTime() / 1000).toString());
+        const warningExec = warningPrep.run(guild, user, parseInt(points), issuer, (reason || 'No reason provided.'), time);
         resolve(warningExec);
       }
       catch(err) {
