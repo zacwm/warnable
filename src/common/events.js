@@ -4,7 +4,7 @@
 const { client, modules, logs } = require('../warnable');
 const punishments = require('./punishments');
 
-const events = ['ready', 'message', 'interaction', 'guildMemberAdd'];
+const events = ['ready', 'message', 'interaction', 'guildMemberAdd', 'guildMemberRemove'];
 events.forEach((event) => {
   client.on(event, (...args) => {
     runEvent(event, args);

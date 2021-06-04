@@ -19,7 +19,7 @@ exports.guild = ((guild, type, content) => {
     c.send(new MessageEmbed()
     .setTitle(content.title)
     .setDescription(content.description)
-    .setThumbnail(content.setThumbnail)
+    .setThumbnail(content.thumbnail)
     .setColor(content.color));
   })
   .catch(() => {
