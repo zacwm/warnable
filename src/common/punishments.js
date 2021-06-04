@@ -168,7 +168,7 @@ exports.check = (guild) => {
     p.forEach((punishment) => {
       if (parseInt(punishment.unixFinish) > 0 && parseInt(punishment.unixFinish) <= moment().unix()) {
         if (!finishedPunishments[punishment.guild]) finishedPunishments[punishment.guild] = [];
-        finishedPunishments[punishment.guild].push(`- <@${punishment.user}> (${punishment.user}) | ${punishment.type}`);
+        finishedPunishments[punishment.guild].push(`- <@${punishment.user}> (${punishment.user}) **| Type:** ${punishment.type}`);
         this.stop(punishment.guild, punishment.user, '[punish] Temp-timer concluded.');
       }
     });
@@ -189,12 +189,13 @@ exports.check = (guild) => {
 exports.pointCheck = (guildID, userID, points, issuer) => {
   const serverConfig = process.servers[guildID];
   if (serverConfig) {
-    serverConfig['point-punishments'].every((item) => {
-      if (item.range.min <= points && item.range.max >= points) {
-        const length = moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix();
+    for (let i = 0; i < serverConfig['point-punishments'].length; i++) {
+      const item = serverConfig['point-punishments'][i];
+      if (item.range.min <= points && (item.range.max > 0 ? item.range.max : Infinity) >= points) {
+        const length = item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0;
         this.execute(guildID, userID, item.action.type, issuer, length, '[warnable] Point checkpoint reached');
-        return;
+        break;
       }
-    });
+    }
   }
 };
