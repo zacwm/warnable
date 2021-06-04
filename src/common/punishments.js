@@ -3,6 +3,7 @@
 // Handles checking new point totals or punishment intervals.
 
 const { db, logs, client } = require('../warnable');
+const { MessageEmbed } = require('discord.js');
 const moment = require('moment-timezone');
 
 exports.execute = (guildID, userID, punishmentType, issuer, unix, reason) => {
@@ -26,59 +27,10 @@ exports.execute = (guildID, userID, punishmentType, issuer, unix, reason) => {
           color: 0xe74c3c,
         });
 
-        client.guilds.fetch(guildID)
-        .then((g) => {
-          g.members.fetch(userID)
-          .then(member => {
-
-            // MUTE
-            if (punishmentType === 'mute') {
-              if (serverConfig.roles.mute) {
-                member.roles.add(serverConfig.roles.mute, reason)
-                .then((r) => {
-                  resolve(true, r);
-                })
-                .catch((rErr) => {
-                  reject({ reason: 'Something failed when trying to add the mute role to the member.', catch: rErr });
-                });
-              }
-              else {
-                reject({ reason: 'No mute role is configured for this server.' });
-              }
-            }
-
-            // BAN
-            else if (punishmentType === 'ban') {
-              member.ban({ reason: reason })
-              .then((r) => {
-                resolve(true, r);
-              })
-              .catch((rErr) => {
-                reject({ reason: 'Something failed when trying to ban the member.', catch: rErr });
-              });
-            }
-
-            // KICK
-            else if (punishmentType === 'kick') {
-              member.kick(reason)
-              .then((r) => {
-                resolve(true, r);
-              })
-              .catch((rErr) => {
-                reject({ reason: 'Something failed when trying to ban the member.', catch: rErr });
-              });
-            }
-            else {
-              reject(null);
-            }
-
-          })
-          .catch((mErr) => {
-            reject({ reason: 'Something failed when trying to lookup the member.', catch: mErr });
-          });
-        })
-        .catch((gErr) => {
-          reject({ reason: 'Something failed when trying to lookup the server.', catch: gErr });
+        runGuildEvents(guildID, userID, punishmentType, reason)
+        .then(() => { resolve(true); })
+        .catch((rErr) => {
+          reject(rErr);
         });
       })
       .catch((pErr) => {
@@ -95,7 +47,15 @@ exports.rejoin = (guild, user) => {
   db.listPunishments(guild)
   .then((p) => {
     const punishment = p.find(punish => punish.user === user);
-    console.dir(punishment);
+    if (punishment) {
+      runGuildEvents(punishment.guild, punishment.user, punishment.type, 'Joined back with an active punishment.')
+      .then(() => {
+        console.dir('OK');
+      })
+      .catch((rErr) => {
+        console.error(rErr);
+      });
+    }
   })
   .catch((pErr) => {
     console.error(pErr);
@@ -192,10 +152,126 @@ exports.pointCheck = (guildID, userID, points, issuer) => {
     for (let i = 0; i < serverConfig['point-punishments'].length; i++) {
       const item = serverConfig['point-punishments'][i];
       if (item.range.min <= points && (item.range.max > 0 ? item.range.max : Infinity) >= points) {
-        const length = item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0;
-        this.execute(guildID, userID, item.action.type, issuer, length, '[warnable] Point checkpoint reached');
+        if (item['direct-message']) {
+          client.guilds.fetch(guildID)
+          .then((g) => {
+            g.members.fetch(userID)
+            .then(member => {
+              member.user.send(new MessageEmbed()
+              .setTitle(item['direct-message'].title)
+              .setDescription(item['direct-message'].body)
+              .setColor(0xe74c3c))
+              .then(() => {
+                this.execute(
+                  guildID,
+                  userID,
+                  item.action.type,
+                  issuer,
+                  item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
+                  '[warnable] Point checkpoint reached',
+                );
+              })
+              .catch((sErr) => {
+                this.execute(
+                  guildID,
+                  userID,
+                  item.action.type,
+                  issuer,
+                  item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
+                  '[warnable] Point checkpoint reached',
+                );
+                console.error(sErr);
+                logs.console('error', 'Failed to send a message to the member when performing a punishment DM.');
+              });
+            })
+            .catch((mErr) => {
+              this.execute(
+                guildID,
+                userID,
+                item.action.type,
+                issuer,
+                item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
+                '[warnable] Point checkpoint reached',
+              );
+              console.error(mErr);
+              logs.console('error', 'Failed to fetch the member when performing a punishment DM.');
+            });
+          })
+          .catch((gErr) => {
+            this.execute(
+              guildID,
+              userID,
+              item.action.type,
+              issuer,
+              item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
+              '[warnable] Point checkpoint reached',
+            );
+            console.error(gErr);
+            logs.console('error', 'Failed to fetch the guild when performing a punishment DM.');
+          });
+        }
         break;
       }
     }
   }
 };
+
+// general stuff, i still need to clean so much :///////////
+
+function runGuildEvents(guildID, userID, punishmentType, reason) {
+  return new Promise((resolve, reject) => {
+    client.guilds.fetch(guildID)
+    .then((g) => {
+      const serverConfig = process.servers[guildID];
+      g.members.fetch(userID)
+      .then(member => {
+        // MUTE
+        if (punishmentType === 'mute') {
+          if (serverConfig.roles.mute) {
+            member.roles.add(serverConfig.roles.mute, reason)
+            .then((r) => {
+              resolve(true, r);
+            })
+            .catch((rErr) => {
+              reject({ reason: 'Something failed when trying to add the mute role to the member.', catch: rErr });
+            });
+          }
+          else {
+            reject({ reason: 'No mute role is configured for this server.' });
+          }
+        }
+
+        // BAN
+        else if (punishmentType === 'ban') {
+          member.ban({ reason: reason })
+          .then((r) => {
+            resolve(true, r);
+          })
+          .catch((rErr) => {
+            reject({ reason: 'Something failed when trying to ban the member.', catch: rErr });
+          });
+        }
+
+        // KICK
+        else if (punishmentType === 'kick') {
+          member.kick(reason)
+          .then((r) => {
+            resolve(true, r);
+          })
+          .catch((rErr) => {
+            reject({ reason: 'Something failed when trying to ban the member.', catch: rErr });
+          });
+        }
+        else {
+          reject(null);
+        }
+      })
+      .catch((mErr) => {
+        reject({ reason: 'Something failed when trying to lookup the member.', catch: mErr });
+      });
+    })
+    .catch((gErr) => {
+      reject({ reason: 'Something failed when trying to lookup the server.', catch: gErr });
+    });
+  });
+}

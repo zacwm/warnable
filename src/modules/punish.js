@@ -138,7 +138,7 @@ exports.interaction = async (interaction) => {
         .catch((pErr) => {
           console.error(pErr);
           const embedMessage = new MessageEmbed()
-          .setDescription('Something failed.');
+          .setDescription(`${pErr.reason}`);
           interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
         });
       }
