@@ -50,7 +50,11 @@ exports.rejoin = (guild, user) => {
     if (punishment) {
       runGuildEvents(punishment.guild, punishment.user, punishment.type, 'Joined back with an active punishment.')
       .then(() => {
-        console.dir('OK');
+        logs.guild(punishment.guild, 'main', {
+          title: 'Rejoined punishment',
+          description: `The user <@${punishment.user}> (${punishment.user}) has rejoined the server with an active punishment.\n**Type:** ${punishment.type}\n\n**Their punishment was applied again.**`,
+          color: 0xd35400,
+        });
       })
       .catch((rErr) => {
         console.error(rErr);
