@@ -3,7 +3,13 @@
 const { logs, client, db } = require('../warnable');
 const { pointCheck } = require('../common/punishments');
 
-exports.message = function automod(msg) {
+exports.message = checkMessage;
+exports.messageUpdate = function messageUpdate(_msgOld, msgNew) {
+  checkMessage(msgNew);
+};
+
+// Check message
+function checkMessage(msg) {
   if (!msg.guild) return;
   if (msg.author.bot) return;
 
@@ -14,31 +20,30 @@ exports.message = function automod(msg) {
     // Discord Invites
     if (serverConfig.automod.invites.enabled) {
       const inviteCodes = msg.content.match(/(https?:\/\/)?(www.)?(discord.(gg|io|me|li)|discordapp.com\/invite)\/[^\s/]+?(?=\b)/gm);
-      /* const deleteMessage = inviteCodes.some(function(urls) {
-        const parsedInvite = urls.replace(/(https?:\/\/)?(www.)?(discord.(gg|io|me|li)|discordapp.com\/invite)\//gm, '').split('/')[0];
-        return !(serverConfig.automod.invites.excluded || []).includes(parsedInvite);
-      }); */
-      for (let i = 0; i < inviteCodes.length; i++) {
-        console.dir(inviteCodes[i]);
-        client.fetchInvite(inviteCodes[i])
-        .then((res) => {
-          if (res.guild) {
-            if (!serverConfig.automod.invites.excluded.includes(res.guild.id)) {
-              runAutomod(msg, 'invites', inviteCodes[i]);
+      if (inviteCodes) {
+        for (let i = 0; i < inviteCodes.length; i++) {
+          client.fetchInvite(inviteCodes[i])
+          .then((res) => {
+            if (res.guild) {
+              if (!serverConfig.automod.invites.excluded.includes(res.guild.id)) {
+                runAutomod(msg, 'invites', inviteCodes[i]);
+              }
             }
-          }
-          else {
+            else {
+              runAutomod(msg, 'invites', 'Unknown');
+            }
+          })
+          .catch(() => {
             runAutomod(msg, 'invites', 'Unknown');
-          }
-        })
-        .catch(() => {
-          runAutomod(msg, 'invites', 'Unknown');
-        });
+          });
+        }
       }
     }
   }
-};
+}
 
+
+// Run Automod delete and warn
 function runAutomod(msg, type, reasonExtras) {
   msg.delete();
   const automodTypeProps = process.servers[msg.guild.id].automod[type];
