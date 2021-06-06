@@ -2,6 +2,7 @@
 
 const { logs, client, db } = require('../warnable');
 const { pointCheck } = require('../common/punishments');
+const { MessageEmbed } = require('discord.js');
 
 exports.message = checkMessage;
 exports.messageUpdate = function messageUpdate(_msgOld, msgNew) {
@@ -45,9 +46,25 @@ function checkMessage(msg) {
 
 // Run Automod delete and warn
 function runAutomod(msg, type, reasonExtras) {
-  msg.delete();
   const automodTypeProps = process.servers[msg.guild.id].automod[type];
-  if (automodTypeProps.points > 0) {
+  // Reply to member
+  if (automodTypeProps.reply) {
+    msg.reply({ embed: new MessageEmbed()
+      .setDescription(automodTypeProps.reply.replace('{@user}', `<@${msg.author.id}>`))
+      .setColor(0xe74c3c),
+    })
+    .then(() => {
+      msg.delete();
+    })
+    .catch(() => {
+      msg.delete();
+    });
+  }
+  else {
+    msg.delete();
+  }
+  // Add warning
+  if (automodTypeProps.points) {
     const wGuildID = msg.guild.id;
     const wUserID = msg.author.id;
     const wPoints = automodTypeProps.points || 0;
