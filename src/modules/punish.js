@@ -80,98 +80,132 @@ exports.guildMemberAdd = (member) => {
 exports.interaction = async (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    if (interaction.options[0].name === 'list') {
-      db.listPunishments(interaction.guildID)
-      .then(p => {
-        if (p.length > 0) {
-          p.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
-          const arrayChunks = Array(Math.ceil(p.length / 5)).fill().map((_, index) => index * 5).map(begin => p.slice(begin, begin + 5));
-          const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
-          if (page > -1 && arrayChunks.length > page) {
-            const embedMessage = new MessageEmbed()
-            .setTitle(`Active server punishments | Total: ${p.length}`)
-            .setDescription(`${arrayChunks[page].map((punish) => `<@${punish.user}> | ${parseInt(punish.unixFinish) > 0 ? 'Temp-' : ''}${punish.type}\n└  Issuer: <@${punish.issuer}> | Finish time: ${moment.unix(punish.unixFinish).utc().tz('Australia/Brisbane').format('MMMM Do YYYY, h:mm a')}`).join('\n')}`)
-            .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : '');
-            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-          }
-          else {
-            interaction.reply({ embeds: [
-              new MessageEmbed()
-              .setDescription('Invalid page number.'),
-            ], ephemeral: true });
-          }
-        }
-        else {
-          const embedMessage = new MessageEmbed()
-          .setDescription('There are no active punishments for the server.');
-          interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-        }
-      })
-      .catch(pErr => {
-        console.error(pErr);
-        const embedMessage = new MessageEmbed()
-        .setDescription('Something failed.');
-        interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-      });
-    }
-    else if (interaction.options[0].name === 'start') {
-      if (interaction.options[0].options[0].value.match(/\d+/g)) {
-        const user = interaction.options[0].options[0].value.match(/\d+/g)[0];
-        const type = interaction.options[0].options[1].value.replace('punish_', '');
-        const length = type !== 'kick' ? (interaction.options[0].options[2] ? moment().add(parseInt(interaction.options[0].options[2].value.match(/\d+/g)[0]), interaction.options[0].options[2].value.match(/\D/g)[0]) : undefined) : undefined;
-        punishments.execute(interaction.guildID, user, type, interaction.user.id, length ? moment(length).unix() : 0, `[punish] ${length ? 'temp-' : ''}${type} started by ${interaction.user.tag}. Their punishment will finish ${length ? moment().to(length) : 'NEVER.'}`)
-        .then((pRes) => {
-          if (pRes) {
-            const embedMessage = new MessageEmbed()
-            .setTitle('Punishment started')
-            .setDescription(`**Punished:** <@${user}>`
-            + `\n**Type:** ${type}`
-            + `\n**Finishes:** ${length ? moment().to(length) : 'NEVER'}`);
-            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-          }
-          else {
+    const serverConfig = process.servers[interaction.guildID];
+    if (serverConfig) {
+      const member = await interaction.member.fetch();
+      if (interaction.options[0].name === 'list') {
+        if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
+          db.listPunishments(interaction.guildID)
+          .then(p => {
+            if (p.length > 0) {
+              p.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
+              const arrayChunks = Array(Math.ceil(p.length / 5)).fill().map((_, index) => index * 5).map(begin => p.slice(begin, begin + 5));
+              const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
+              if (page > -1 && arrayChunks.length > page) {
+                const embedMessage = new MessageEmbed()
+                .setTitle(`Active server punishments | Total: ${p.length}`)
+                .setDescription(`${arrayChunks[page].map((punish) => `<@${punish.user}> | ${parseInt(punish.unixFinish) > 0 ? 'Temp-' : ''}${punish.type}\n└  Issuer: <@${punish.issuer}> | Finish time: ${moment.unix(punish.unixFinish).utc().tz(serverConfig.timezone || 'UTC').format('MMMM Do YYYY, h:mm a')}`).join('\n')}`)
+                .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : '');
+                interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+              }
+              else {
+                interaction.reply({ embeds: [
+                  new MessageEmbed()
+                  .setDescription('Invalid page number.'),
+                ], ephemeral: true });
+              }
+            }
+            else {
+              const embedMessage = new MessageEmbed()
+              .setDescription('There are no active punishments for the server.');
+              interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+            }
+          })
+          .catch(pErr => {
+            console.error(pErr);
             const embedMessage = new MessageEmbed()
             .setDescription('Something failed.');
             interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-          }
-        })
-        .catch((pErr) => {
-          console.error(pErr);
-          const embedMessage = new MessageEmbed()
-          .setDescription(`${pErr.reason}`);
-          interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-        });
+          });
+        }
+        else {
+          interaction.reply({ embeds: [
+            new MessageEmbed()
+            .setDescription('You don\'t have permission to use this command.'),
+          ], ephemeral: true });
+        }
       }
-      else {
-        const embedMessage = new MessageEmbed()
-        .setDescription('An invalid mention or ID was provided.');
-        interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+      else if (interaction.options[0].name === 'start') {
+        if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
+          if (interaction.options[0].options[0].value.match(/\d+/g)) {
+            const user = interaction.options[0].options[0].value.match(/\d+/g)[0];
+            const type = interaction.options[0].options[1].value.replace('punish_', '');
+            const length = type !== 'kick' ? (interaction.options[0].options[2] ? moment().add(parseInt(interaction.options[0].options[2].value.match(/\d+/g)[0]), interaction.options[0].options[2].value.match(/\D/g)[0]) : undefined) : undefined;
+            punishments.execute(interaction.guildID, user, type, interaction.user.id, length ? moment(length).unix() : 0, `[punish] ${length ? 'temp-' : ''}${type} started by ${interaction.user.tag}. Their punishment will finish ${length ? moment().to(length) : 'NEVER.'}`)
+            .then((pRes) => {
+              if (pRes) {
+                const embedMessage = new MessageEmbed()
+                .setTitle('Punishment started')
+                .setDescription(`**Punished:** <@${user}>`
+                + `\n**Type:** ${type}`
+                + `\n**Finishes:** ${length ? moment().to(length) : 'NEVER'}`);
+                interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+              }
+              else {
+                const embedMessage = new MessageEmbed()
+                .setDescription('Something failed.');
+                interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+              }
+            })
+            .catch((pErr) => {
+              console.error(pErr);
+              const embedMessage = new MessageEmbed()
+              .setDescription(`${pErr.reason}`);
+              interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+            });
+          }
+          else {
+            const embedMessage = new MessageEmbed()
+            .setDescription('An invalid mention or ID was provided.');
+            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+          }
+        }
+        else {
+          interaction.reply({ embeds: [
+            new MessageEmbed()
+            .setDescription('You don\'t have permission to use this command.'),
+          ], ephemeral: true });
+        }
+      }
+      else if (interaction.options[0].name === 'stop') {
+        if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
+          punishments.stop(
+            interaction.guildID,
+            interaction.options[0].options[0].value.match(/\d+/g)[0],
+            interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.',
+          )
+          .then(() => {
+            logs.guild(interaction.guildID, 'main', {
+              title: 'Punishment stopped',
+              description: `The punishment for <@${interaction.options[0].options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].options[0].value.match(/\d+/g)[0]}) was stopped by <@${interaction.user.id}>`
+              + `\n**Reason:** \`${interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.'}\``,
+              color: 0x1abc9c,
+            });
+            interaction.reply({ embeds: [
+              new MessageEmbed()
+              .setDescription('The punishment was stopped!'),
+            ], ephemeral: true });
+          })
+          .catch((rErr) => {
+            interaction.reply({ embeds: [
+              new MessageEmbed()
+              .setDescription(`An error occured trying to stop the punishment...\n\`\`\`\n${rErr.reason}\n\`\`\``),
+            ], ephemeral: true });
+          });
+        }
+        else {
+          interaction.reply({ embeds: [
+            new MessageEmbed()
+            .setDescription('You don\'t have permission to use this command.'),
+          ], ephemeral: true });
+        }
       }
     }
-    else if (interaction.options[0].name === 'stop') {
-      punishments.stop(
-        interaction.guildID,
-        interaction.options[0].options[0].value.match(/\d+/g)[0],
-        interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.',
-      )
-      .then(() => {
-        logs.guild(interaction.guildID, 'main', {
-          title: 'Punishment stopped',
-          description: `The punishment for <@${interaction.options[0].options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].options[0].value.match(/\d+/g)[0]}) was stopped by <@${interaction.user.id}>`
-          + `\n**Reason:** \`${interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.'}\``,
-          color: 0x1abc9c,
-        });
-        interaction.reply({ embeds: [
-          new MessageEmbed()
-          .setDescription('The punishment was stopped!'),
-        ], ephemeral: true });
-      })
-      .catch((rErr) => {
-        interaction.reply({ embeds: [
-          new MessageEmbed()
-          .setDescription(`An error occured trying to stop the punishment...\n\`\`\`\n${rErr.reason}\n\`\`\``),
-        ], ephemeral: true });
-      });
+    else {
+      interaction.reply({ embeds: [
+        new MessageEmbed()
+        .setDescription('This server isn\'t configured by the bot admin.'),
+      ], ephemeral: true });
     }
   }
 };
