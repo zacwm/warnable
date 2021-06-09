@@ -81,6 +81,11 @@ function runAutomod(msg, type, reasonExtras) {
     db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason, wTime)
     .then(async (v) => {
       if (v) {
+        if (!process.lastWarnings) process.lastWarnings = {};
+        if (!process.lastWarnings[wGuildID]) process.lastWarnings[wGuildID] = [];
+        process.lastWarnings[wGuildID].unshift({ user: wUserID, points: wPoints, issuer: wIssuerID, reason: wReason, time: wTime });
+        if (process.lastWarnings[wGuildID].length > 50) process.lastWarnings[wGuildID].pop();
+
         const newList = await db.listWarnings(wGuildID, wUserID);
         const pointTotal = newList.reduce((prev, val) => prev + val.points, 0);
         const descString = `**Warned:** <@${wUserID}> (${wUserID})`

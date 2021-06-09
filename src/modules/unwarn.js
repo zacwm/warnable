@@ -1,21 +1,34 @@
 const { MessageEmbed } = require('discord.js');
 const { db } = require('../warnable');
+const moment = require('moment-timezone');
 
 exports.meta = {
   name: 'unwarn',
   description: 'Removes a warning from a member.',
   options: [
     {
-      name: 'user',
-      type: 'STRING',
-      description: 'The user to warn | @mention or ID',
-      required: true,
+      name: 'last',
+      description: 'Removes any last warning by time in the server.',
+      type: 'SUB_COMMAND',
     },
     {
-      name: 'number',
-      type: 'INTEGER',
-      description: 'The number warning that is shown in the list to remove.',
-      required: true,
+      name: 'member',
+      description: 'Removes a warning from a member by warning position from list.',
+      type: 'SUB_COMMAND',
+      options: [
+        {
+          name: 'user',
+          type: 'STRING',
+          description: 'The user to warn | @mention or ID',
+          required: true,
+        },
+        {
+          name: 'number',
+          type: 'INTEGER',
+          description: 'The number warning that is shown in the list to remove.',
+          required: true,
+        },
+      ],
     },
   ],
 };
@@ -27,56 +40,90 @@ exports.interaction = async (interaction) => {
     if (serverConfig) {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
-        if (interaction.options[0].value.match(/\d+/g)) {
-          db.listWarnings(
-            interaction.guildID,
-            interaction.options[0].value.match(/\d+/g)[0],
-          )
-          .then((v) => {
-            v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
-            const warningNum = parseInt(interaction.options[1].value);
-            if (warningNum > 0 && v.length >= warningNum) {
-              /*
-               * Heads up to whoever is looking at this :----------)
-               * I know.... It could've been done by giving each warning it's own UID,
-               * but using the sort and unixTime is close enough imo lol, less work for me, the db, and the user kinda...
-               */
-              db.removeWarning(
-                interaction.guildID,
-                interaction.options[0].value.match(/\d+/g)[0],
-                v[warningNum - 1].unixTime,
-              )
+        if (interaction.options[0].name === 'last') {
+          if (!process.lastWarnings) process.lastWarnings = {};
+          if (!process.lastWarnings[interaction.guildID]) process.lastWarnings[interaction.guildID] = [];
+          if (process.lastWarnings[interaction.guildID].length > 0) {
+            const removedWarning = process.lastWarnings[interaction.guildID].shift();
+            if (removedWarning) {
+              db.removeWarning(interaction.guildID, removedWarning.user, removedWarning.time)
               .then(() => {
                 interaction.reply({ embeds: [
                   new MessageEmbed()
-                  .setDescription('Warning deleted!'),
+                  .setTitle('Removed last warning.')
+                  .setDescription(`**User:** <@${removedWarning.user}> | **Points:** ${removedWarning.points}`
+                  + `\n**Issuer:** <@${removedWarning.issuer}> | **Time:** ${(removedWarning.time && removedWarning.time !== 0) ? moment.unix(removedWarning.time).utc().tz(serverConfig.timezone || 'UTC').format('MMMM Do YYYY, h:mm a') : 'Unknown'}`
+                  + `\n**Reason:** \`${removedWarning.reason}\``),
                 ], ephemeral: true });
               })
-              .catch((qErr) => {
-                console.error(qErr);
+              .catch((rErr) => {
+                console.error(rErr);
                 interaction.reply({ embeds: [
                   new MessageEmbed()
-                  .setDescription('Something failed.'),
+                  .setDescription('Failed to remove the last warning...'),
                 ], ephemeral: true });
               });
             }
-            else {
-              interaction.reply({ embeds: [
-                new MessageEmbed()
-                .setDescription('No warning is at that position.'),
-              ], ephemeral: true });
-            }
-          }).catch((vErr) => {
-            console.error(vErr);
-            const embedMessage = new MessageEmbed()
-            .setDescription('Something failed...');
-            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-          });
+          }
+          else {
+            interaction.reply({ embeds: [
+              new MessageEmbed()
+              .setDescription('No more recent warnings.'),
+            ], ephemeral: true });
+          }
         }
-        else {
-          const embedMessage = new MessageEmbed()
-          .setDescription('An invalid mention or ID was provided.');
-          interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+        else if (interaction.options[0].name === 'member') {
+          if (interaction.options[0].options[0].value.match(/\d+/g)) {
+            db.listWarnings(
+              interaction.guildID,
+              interaction.options[0].options[0].value.match(/\d+/g)[0],
+            )
+            .then((v) => {
+              v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
+              const warningNum = parseInt(interaction.options[0].options[1].value);
+              if (warningNum > 0 && v.length >= warningNum) {
+                /*
+                 * Heads up to whoever is looking at this :----------)
+                 * I know.... It could've been done by giving each warning it's own UID,
+                 * but using the sort and unixTime is close enough imo lol, less work for me, the db, and the user kinda...
+                 */
+                db.removeWarning(
+                  interaction.guildID,
+                  interaction.options[0].options[0].value.match(/\d+/g)[0],
+                  v[warningNum - 1].unixTime,
+                )
+                .then(() => {
+                  interaction.reply({ embeds: [
+                    new MessageEmbed()
+                    .setDescription('Warning deleted!'),
+                  ], ephemeral: true });
+                })
+                .catch((qErr) => {
+                  console.error(qErr);
+                  interaction.reply({ embeds: [
+                    new MessageEmbed()
+                    .setDescription('Something failed.'),
+                  ], ephemeral: true });
+                });
+              }
+              else {
+                interaction.reply({ embeds: [
+                  new MessageEmbed()
+                  .setDescription('No warning is at that position.'),
+                ], ephemeral: true });
+              }
+            }).catch((vErr) => {
+              console.error(vErr);
+              const embedMessage = new MessageEmbed()
+              .setDescription('Something failed...');
+              interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+            });
+          }
+          else {
+            const embedMessage = new MessageEmbed()
+            .setDescription('An invalid mention or ID was provided.');
+            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
+          }
         }
       }
       else {
