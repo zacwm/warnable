@@ -13,6 +13,13 @@ exports.meta = {
       name: 'list',
       description: 'List all active punishments for the server.',
       type: 'SUB_COMMAND',
+      options: [
+        {
+          name: 'page',
+          type: 'INTEGER',
+          description: 'The page of punishments to show.',
+        },
+      ],
     },
     {
       name: 'start',
@@ -90,7 +97,7 @@ exports.interaction = async (interaction) => {
             if (p.length > 0) {
               p.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
               const arrayChunks = Array(Math.ceil(p.length / 5)).fill().map((_, index) => index * 5).map(begin => p.slice(begin, begin + 5));
-              const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
+              const page = interaction.options[0].options[0] ? parseInt(interaction.options[0].options[0].value) - 1 : 0;
               if (page > -1 && arrayChunks.length > page) {
                 const embedMessage = new MessageEmbed()
                 .setTitle(`Active server punishments | Total: ${p.length}`)
