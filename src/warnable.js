@@ -48,7 +48,6 @@ require('dotenv').config();
     try {
       if (!file.endsWith('.js')) return;
       this.modules[file] = require(path.join(__dirname, './modules', file));
-      this.logs.console('module', `Module loaded ${file}`);
     }
     catch(err) {
       this.logs.console('error', `Error thrown trying to load module '${file}'`);
