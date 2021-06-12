@@ -58,7 +58,7 @@ exports.interaction = async (interaction) => {
               + `\n**Points:** ${wPoints} point${wPoints !== 1 ? 's' : ''} (New total: ${pointTotal || '?'})`
               + `\n**Reason:** \`${wReason}\``;
 
-              if (pointTotal) pointCheck(wGuildID, wUserID, pointTotal, wIssuerID);
+              if (pointTotal && wPoints > 0) pointCheck(wGuildID, wUserID, pointTotal, wIssuerID);
 
               logs.guild(interaction.guildID, 'main', {
                 title: 'New warning',
