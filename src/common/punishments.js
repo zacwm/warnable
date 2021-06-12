@@ -29,9 +29,7 @@ exports.execute = (guildID, userID, punishmentType, issuer, unix, reason) => {
 
         runGuildEvents(guildID, userID, punishmentType, reason)
         .then(() => { resolve(true); })
-        .catch((rErr) => {
-          reject(rErr);
-        });
+        .catch((rErr) => { reject(rErr); });
       })
       .catch((pErr) => {
         reject({ reason: 'Something failed when trying to add the punishment to the database.', catch: pErr });
@@ -157,6 +155,24 @@ exports.pointCheck = (guildID, userID, points, issuer) => {
       const item = serverConfig['point-punishments'][i];
       if (item.range.min <= points && (item.range.max > 0 ? item.range.max : Infinity) >= points) {
         if (item['direct-message']) {
+          const doExecute = () => {
+            this.execute(
+              guildID,
+              userID,
+              item.action.type,
+              issuer,
+              item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
+              '[warnable] Point checkpoint reached',
+            )
+            .then(() => {
+              logs.console('punish', `Punishment started for '${userID}' in '${guildID}'`);
+            })
+            .catch((executeErr) => {
+              console.error(executeErr);
+              logs.console('error', `Execute failed for '${userID}' in '${guildID}'`);
+            });
+          };
+
           client.guilds.fetch(guildID)
           .then((g) => {
             g.members.fetch(userID)
@@ -166,50 +182,22 @@ exports.pointCheck = (guildID, userID, points, issuer) => {
               .setDescription(item['direct-message'].body)
               .setColor(0xe74c3c))
               .then(() => {
-                this.execute(
-                  guildID,
-                  userID,
-                  item.action.type,
-                  issuer,
-                  item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
-                  '[warnable] Point checkpoint reached',
-                );
+                doExecute();
               })
               .catch((sErr) => {
-                this.execute(
-                  guildID,
-                  userID,
-                  item.action.type,
-                  issuer,
-                  item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
-                  '[warnable] Point checkpoint reached',
-                );
+                doExecute();
                 console.error(sErr);
                 logs.console('error', 'Failed to send a message to the member when performing a punishment DM.');
               });
             })
             .catch((mErr) => {
-              this.execute(
-                guildID,
-                userID,
-                item.action.type,
-                issuer,
-                item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
-                '[warnable] Point checkpoint reached',
-              );
+              doExecute();
               console.error(mErr);
               logs.console('error', 'Failed to fetch the member when performing a punishment DM.');
             });
           })
           .catch((gErr) => {
-            this.execute(
-              guildID,
-              userID,
-              item.action.type,
-              issuer,
-              item.action.length ? moment(moment().add(parseInt(item.action.length.match(/\d+/g)[0]), item.action.length.match(/\D/g)[0])).unix() : 0,
-              '[warnable] Point checkpoint reached',
-            );
+            doExecute();
             console.error(gErr);
             logs.console('error', 'Failed to fetch the guild when performing a punishment DM.');
           });
