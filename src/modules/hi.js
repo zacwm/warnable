@@ -11,7 +11,6 @@ exports.meta = {
 exports.interaction = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    console.dir(interaction);
     fetch('http://aws.random.cat/meow')
     .then(res => res.json())
     .then(json => {
