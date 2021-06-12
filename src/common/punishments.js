@@ -191,13 +191,11 @@ exports.pointCheck = (guildID, userID, points, issuer) => {
               });
             })
             .catch((mErr) => {
-              doExecute();
               console.error(mErr);
               logs.console('error', 'Failed to fetch the member when performing a punishment DM.');
             });
           })
           .catch((gErr) => {
-            doExecute();
             console.error(gErr);
             logs.console('error', 'Failed to fetch the guild when performing a punishment DM.');
           });
