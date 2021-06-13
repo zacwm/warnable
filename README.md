@@ -16,9 +16,19 @@ Warnable makes moderation tracking easy! Allowing Discord server moderators to a
 
 Check out the [commands](./Commands.md) (GIF demos included!)
 
-## Thank you ♥
+## Feature list
+- Multiple server support
+- Discord Slash Command Support
+- Point based warning system
+- Punishment manager - Handles temporary punishments and detects rejoins.
+- Automod - Discord invites, Link Filter, Bad Words
+- Range of database types - MySQL, SQLite, MongoDB
+
+## Thank you
 Huge thanks to all the [contributors](https://github.com/zacimac/warnable/graphs/contributors) that help make Warnable better for everyone!
 
 Also huge thanks to all of my [sponsors](https://github.com/sponsors/zacimac):
 - 🌟 - [elybeatmaker](https://github.com/elybeatmaker)
 - ex-🌟- [aditya-learns](https://github.com/aditya-learns)
+
+You can also show your support by giving us a star! ♥
