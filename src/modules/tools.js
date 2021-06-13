@@ -2,6 +2,7 @@
 
 const { MessageEmbed } = require('discord.js');
 const { client } = require('../warnable');
+const moment = require('moment-timezone');
 
 exports.meta = {
   name: 'tools',
@@ -41,6 +42,7 @@ exports.interaction = async function toolsModule(interaction) {
 	if (interaction.commandName === this.meta.name) {
     const serverConfig = process.servers[interaction.guildID];
     if (serverConfig) {
+      if (!interaction.options[0].options) interaction.options[0].options = [];
       const member = await interaction.member.fetch();
       // # Prune
       if (interaction.options[0].name === 'prune') {
@@ -86,11 +88,38 @@ exports.interaction = async function toolsModule(interaction) {
       // # Member
       if (interaction.options[0].name === 'member') {
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
-          interaction.reply({ embeds: [
-            new MessageEmbed()
-            .setDescription('q')
-            .setColor(0x95a5a6),
-          ], ephemeral: true });
+          client.guilds.fetch(interaction.guildID)
+          .then((g) => {
+            g.members.fetch(interaction.options[0].options[0].value.match(/\d+/g))
+            .then((m) => {
+              console.dir(m);
+              interaction.reply({ embeds: [
+                new MessageEmbed()
+                .setDescription('**Member information**')
+                .addField('Name', `\`${m.user.username}#${m.user.discriminator}\``, true)
+                .addField('User ID', `\`${m.user.id}\``, true)
+                .addField('Nickname', m.nickname ? `\`${m.nickname}\`` : '**none**', true)
+                .addField('Joined At', `\`${moment(m.joinedAt).format()}\``, true)
+                .setThumbnail(m.user.avatarURL({ dynamic: true }))
+                .setColor(0x2ecc71),
+              ], ephemeral: true });
+            })
+            .catch((mErr) => {
+              console.dir(mErr);
+              interaction.reply({ embeds: [
+                new MessageEmbed()
+                .setDescription('Failed to lookup member. Check if their ID is correct?')
+                .setColor(0x95a5a6),
+              ], ephemeral: true });
+            });
+          })
+          .catch(() => {
+            interaction.reply({ embeds: [
+              new MessageEmbed()
+              .setDescription('Something failed looking up server.')
+              .setColor(0x95a5a6),
+            ], ephemeral: true });
+          });
         }
         else {
           interaction.reply({ embeds: [

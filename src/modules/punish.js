@@ -89,6 +89,7 @@ exports.interaction = async (interaction) => {
 	if (interaction.commandName === this.meta.name) {
     const serverConfig = process.servers[interaction.guildID];
     if (serverConfig) {
+      if (!interaction.options[0].options) interaction.options[0].options = [];
       const member = await interaction.member.fetch();
       if (interaction.options[0].name === 'list') {
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
