@@ -18,6 +18,8 @@
     "dotenv": "^9.0.2",
     "eslint": "^7.26.0",
     "fetch": "^1.1.0",
-    "moment-timezone": "^0.5.33"
+    "moment-timezone": "^0.5.33",
+    "mongoose": "^5.12.13",
+    "mysql2": "^2.2.5"
   }
 }
