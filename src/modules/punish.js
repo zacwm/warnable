@@ -89,16 +89,20 @@ exports.interaction = async (interaction) => {
 	if (interaction.commandName === this.meta.name) {
     const serverConfig = process.servers[interaction.guildID];
     if (serverConfig) {
+      console.dir(interaction);
       if (!interaction.options[0].options) interaction.options[0].options = [];
       const member = await interaction.member.fetch();
-      if (interaction.options[0].name === 'list') {
+
+      // # sub-cmd = list
+      if (interaction.options.has('list')) {
+        const subOptsList = interaction.options.get('list').options;
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
           db.listPunishments(interaction.guildID)
           .then(p => {
             if (p.length > 0) {
               p.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
               const arrayChunks = Array(Math.ceil(p.length / 5)).fill().map((_, index) => index * 5).map(begin => p.slice(begin, begin + 5));
-              const page = interaction.options[0].options[0] ? parseInt(interaction.options[0].options[0].value) - 1 : 0;
+              const page = subOptsList.has('page') ? subOptsList.get('page') - 1 : 0;
               if (page > -1 && arrayChunks.length > page) {
                 const embedMessage = new MessageEmbed()
                 .setTitle(`Active server punishments | Total: ${p.length}`)
@@ -133,12 +137,15 @@ exports.interaction = async (interaction) => {
           ], ephemeral: true });
         }
       }
-      else if (interaction.options[0].name === 'start') {
+
+      // # sub-cmd = start
+      else if (interaction.options.has('start')) {
+        const subOptsStart = interaction.options.get('start').options;
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
-          if (interaction.options[0].options[0].value.match(/\d+/g)) {
-            const user = interaction.options[0].options[0].value.match(/\d+/g)[0];
-            const type = interaction.options[0].options[1].value.replace('punish_', '');
-            const length = type !== 'kick' ? (interaction.options[0].options[2] ? moment().add(parseInt(interaction.options[0].options[2].value.match(/\d+/g)[0]), interaction.options[0].options[2].value.match(/\D/g)[0]) : undefined) : undefined;
+          if (subOptsStart.get('user').value.match(/\d+/g)) {
+            const user = subOptsStart.get('user').value.match(/\d+/g)[0];
+            const type = subOptsStart.get('type').value.replace('punish_', '');
+            const length = type !== 'kick' ? (subOptsStart.has('length') ? moment().add(parseInt(subOptsStart.get('length').value.match(/\d+/g)[0]), subOptsStart.get('length').value.match(/\D/g)[0]) : undefined) : undefined;
             punishments.execute(interaction.guildID, user, type, interaction.user.id, length ? moment(length).unix() : 0, `[punish] ${length ? 'temp-' : ''}${type} started by ${interaction.user.tag}. Their punishment will finish ${length ? moment().to(length) : 'NEVER.'}`)
             .then((pRes) => {
               if (pRes) {
@@ -175,18 +182,21 @@ exports.interaction = async (interaction) => {
           ], ephemeral: true });
         }
       }
-      else if (interaction.options[0].name === 'stop') {
+
+      // # sub-cmd = stop
+      else if (interaction.options.has('stop')) {
+        const subOptsStop = interaction.options.get('stop').options;
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
           punishments.stop(
             interaction.guildID,
-            interaction.options[0].options[0].value.match(/\d+/g)[0],
-            interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.',
+            subOptsStop.get('user').value.match(/\d+/g)[0],
+            subOptsStop.has('reason') ? subOptsStop.get('reason').value : 'No reason provided.',
           )
           .then(() => {
             logs.guild(interaction.guildID, 'main', {
               title: 'Punishment stopped',
-              description: `The punishment for <@${interaction.options[0].options[0].value.match(/\d+/g)[0]}> (${interaction.options[0].options[0].value.match(/\d+/g)[0]}) was stopped by <@${interaction.user.id}>`
-              + `\n**Reason:** \`${interaction.options[0].options[1] ? interaction.options[0].options[1].value : 'No reason provided.'}\``,
+              description: `The punishment for <@${subOptsStop.get('user').value.match(/\d+/g)[0]}> (${subOptsStop.get('user').value.match(/\d+/g)[0]}) was stopped by <@${interaction.user.id}>`
+              + `\n**Reason:** \`${subOptsStop.has('reason') ? subOptsStop.get('reason').value : 'No reason provided.'}\``,
               color: 0x1abc9c,
             });
             interaction.reply({ embeds: [

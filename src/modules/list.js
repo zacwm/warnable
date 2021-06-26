@@ -30,16 +30,16 @@ exports.interaction = async (interaction) => {
     if (serverConfig) {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
-        if (interaction.options[0].value.match(/\d+/g)) {
+        if (interaction.options.get('user').value.match(/\d+/g)) {
           db.listWarnings(
             interaction.guildID,
-            interaction.options[0].value.match(/\d+/g)[0],
+            interaction.options.get('user').value.match(/\d+/g)[0],
           )
           .then((v) => {
             if (v.length > 0) {
               v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
               const arrayChunks = Array(Math.ceil(v.length / 5)).fill().map((_, index) => index * 5).map(begin => v.slice(begin, begin + 5));
-              const page = interaction.options[1] ? parseInt(interaction.options[1].value) - 1 : 0;
+              const page = interaction.options.has('page') ? interaction.options.get('page').value - 1 : 0;
               if (page > -1 && arrayChunks.length > page) {
                 interaction.reply({ embeds: [
                   new MessageEmbed()

@@ -36,12 +36,12 @@ exports.interaction = async (interaction) => {
     if (serverConfig) {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
-        if (interaction.options[0].value.match(/\d+/g)) {
+        if (interaction.options.get('user').value.match(/\d+/g)) {
           const wGuildID = interaction.guildID;
-          const wUserID = interaction.options[0].value.match(/\d+/g)[0];
-          const wPoints = parseInt(interaction.options[1].value);
+          const wUserID = interaction.options.get('user').value.match(/\d+/g)[0];
+          const wPoints = parseInt(interaction.options.get('points').value);
           const wIssuerID = interaction.user.id;
-          const wReason = interaction.options[2] ? interaction.options[2].value : 'No reason provied.';
+          const wReason = interaction.options.has('reason') ? interaction.options.get('reason').value : 'No reason provied.';
           const wTime = (new Date(new Date().toUTCString()).getTime() / 1000).toString();
 
           db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason, wTime)

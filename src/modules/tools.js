@@ -42,14 +42,13 @@ exports.interaction = async function toolsModule(interaction) {
 	if (interaction.commandName === this.meta.name) {
     const serverConfig = process.servers[interaction.guildID];
     if (serverConfig) {
-      if (!interaction.options[0].options) interaction.options[0].options = [];
       const member = await interaction.member.fetch();
       // # Prune
-      if (interaction.options[0].name === 'prune') {
+      if (interaction.options.has('prune')) {
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
           client.channels.fetch(interaction.channelID)
           .then((c) => {
-            const pruneAmount = parseInt(interaction.options[0].options[0].value);
+            const pruneAmount = parseInt(interaction.options.get('prune').options.get('amount').value);
             if (pruneAmount > 0 && pruneAmount <= 100) {
               c.bulkDelete(pruneAmount, true)
               .then((m) => {
@@ -86,11 +85,11 @@ exports.interaction = async function toolsModule(interaction) {
         }
       }
       // # Member
-      if (interaction.options[0].name === 'member') {
+      if (interaction.options.has('member')) {
         if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
           client.guilds.fetch(interaction.guildID)
           .then((g) => {
-            g.members.fetch(interaction.options[0].options[0].value.match(/\d+/g))
+            g.members.fetch(interaction.options.get('member').options.get('member').value.match(/\d+/g))
             .then((m) => {
               console.dir(m);
               interaction.reply({ embeds: [

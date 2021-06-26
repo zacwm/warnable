@@ -2,3 +2,4 @@
 .env
 *.db
 servers.json
+database.js

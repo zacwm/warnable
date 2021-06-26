@@ -14,7 +14,7 @@
     "better-sqlite3": "^7.4.0",
     "chalk": "^4.1.1",
     "directory-tree": "^2.2.9",
-    "discord.js": "^13.0.0-dev.086c3f0799d65c64c4e60d6370246a37a27a1eab",
+    "discord.js": "^13.0.0-dev.f7eeccba4b7015496df811f10cc2da2b0fab0630",
     "dotenv": "^9.0.2",
     "eslint": "^7.26.0",
     "fetch": "^1.1.0",

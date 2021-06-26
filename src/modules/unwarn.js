@@ -40,7 +40,9 @@ exports.interaction = async (interaction) => {
     if (serverConfig) {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
-        if (interaction.options[0].name === 'last') {
+
+        // # sub-cmd = last
+        if (interaction.options.has('last')) {
           if (!process.lastWarnings) process.lastWarnings = {};
           if (!process.lastWarnings[interaction.guildID]) process.lastWarnings[interaction.guildID] = [];
           if (process.lastWarnings[interaction.guildID].length > 0) {
@@ -72,15 +74,18 @@ exports.interaction = async (interaction) => {
             ], ephemeral: true });
           }
         }
-        else if (interaction.options[0].name === 'member') {
-          if (interaction.options[0].options[0].value.match(/\d+/g)) {
+
+        // # sub-cmd = member
+        else if (interaction.options.has('member')) {
+          const subOptsMember = interaction.options.get('member').options;
+          if (subOptsMember.get('user').value.match(/\d+/g)) {
             db.listWarnings(
               interaction.guildID,
-              interaction.options[0].options[0].value.match(/\d+/g)[0],
+              subOptsMember.get('user').value.match(/\d+/g)[0],
             )
             .then((v) => {
               v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
-              const warningNum = parseInt(interaction.options[0].options[1].value);
+              const warningNum = subOptsMember.get('number').value;
               if (warningNum > 0 && v.length >= warningNum) {
                 /*
                  * Heads up to whoever is looking at this :----------)
@@ -89,7 +94,7 @@ exports.interaction = async (interaction) => {
                  */
                 db.removeWarning(
                   interaction.guildID,
-                  interaction.options[0].options[0].value.match(/\d+/g)[0],
+                  subOptsMember.get('user').value.match(/\d+/g)[0],
                   v[warningNum - 1].unixTime,
                 )
                 .then(() => {
