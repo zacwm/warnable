@@ -40,6 +40,20 @@ function checkMessage(msg) {
         }
       }
     }
+
+    // Disallowed words
+    if (serverConfig.automod.badwords.enabled && serverConfig.automod.badwords.excluded) {
+      // as a side-effect of hot-reloading, this gets cleared when the config is reloaded. otherwise we'd have to check whether the config has been
+      // reloaded. This could probably be better handled elsewhere (root of the file, forEach(server) and generate the regex, and have a listener/callback
+      // function handle regenerating when the config is reloaded).
+      if (!serverConfig.automod.badwords.regexp) {
+        serverConfig.automod.badwords.regexp = new RegExp('(?:^|[\\s!-@])(' + serverConfig.automod.badwords.excluded.join('|') + ')(?:$|[\\s!-@])');
+      }
+      const match = msg.content.match(serverConfig.automod.badwords.regexp);
+      if (match) {
+        runAutomod(msg, 'badwords', match[1]);
+      }
+    }
   }
 }
 
