@@ -4,6 +4,9 @@ const { MessageEmbed } = require('discord.js');
 const package = require('../../package.json');
 
 exports.meta = {
+  warnable: {
+    type: 'global',
+  },
   name: 'help',
   description: 'Provides help with warnable!',
 };

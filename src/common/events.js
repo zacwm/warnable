@@ -17,16 +17,65 @@ async function runEvent(event, args) {
   if (event === 'ready') {
     if (!client.application.owner) await client.application.fetch();
     logs.console('event', `Logged in and ready as '${client.user.tag}'`);
-    const cmdData = [];
 
-    for(const module in modules) {
-      if (modules[module]['meta']) cmdData.push(modules[module].meta);
+    // Set Global Commands
+    const GlobalCommandData = [];
+    for (const module in modules) {
+      if (modules[module]['meta']) {
+        var moduleMeta = modules[module].meta;
+        if (moduleMeta.warnable.type == 'global') {
+          delete moduleMeta.warnable;
+          GlobalCommandData.push(moduleMeta);
+        }
+      }
     }
+    client.application.commands.set(GlobalCommandData)
+    .then(() => { logs.console('command', `Set ${GlobalCommandData.length} global command${GlobalCommandData.length > 1 ? 's' : ''}.`) })
+    .catch(console.error);
 
-    const appCommands = await client.application.commands.set(cmdData);
-    logs.console('command', `${appCommands.size} application commands applied! `);
-    appCommands.forEach((cmd) => {
-      logs.console('command', `Intention ID: ${cmd.id} | Name: ${cmd.name} (${cmd.description})`);
+    // Set Guild Commands
+    Object.keys(process.servers).forEach((serverID) => {
+      client.guilds.fetch(serverID)
+      .then(Guild => {
+        const GuildCommandData = [];
+        const roleData = process.servers[serverID].roles;
+        for (const module in modules) {
+          try {
+            if (modules[module]['meta']) {
+              var moduleMeta = modules[module].meta;
+              delete moduleMeta.warnable;
+              moduleMeta.permissions = [];
+              if (modules[module].meta.warnable) {
+                if (modules[module].meta.warnable.type === 'guild' && modules[module].meta.warnable.requirements) {
+                  modules[module].meta.warnable.requirements.forEach((reqType) => {
+                    if (roleData[reqType]) {
+                      moduleMeta.permissions.push({
+                        id: roleData[reqType],
+                        type: 'ROLE',
+                        permission: true,
+                      });
+                    }
+                  });
+                
+                  delete moduleMeta.warnable;
+                  GuildCommandData.push(moduleMeta);
+                }
+              }
+            }
+          }
+          catch (ModuleMetaError) {
+            logs.console('error', `Failed at module '${module}'`);
+            console.error(ModuleMetaError);
+          }
+        }
+        Guild.commands.set(GuildCommandData)
+        .then(() => { logs.console('command', `Set ${GuildCommandData.length} command${GuildCommandData.length > 1 ? 's' : ''} for server: ${serverID}`) })
+        .catch(console.error);
+      })
+      .catch((GuildFetchError) => {
+        console.error(GuildFetchError);
+        logs.console('error', `Failed to find configured server '${serverID}', make sure the bot is invited to that server.`);
+      });
     });
 
     // Punishment interval check

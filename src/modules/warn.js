@@ -5,6 +5,10 @@ const { db, logs } = require('../warnable');
 const { pointCheck } = require('../common/punishments');
 
 exports.meta = {
+  warnable: {
+    type: 'guild',
+    requirements: ['admin', 'moderator'],
+  },
   name: 'warn',
   description: 'Applies a warning to a member',
   options: [

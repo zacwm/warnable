@@ -6,6 +6,10 @@ const punishments = require('../common/punishments');
 const moment = require('moment-timezone');
 
 exports.meta = {
+  warnable: {
+    type: 'guild',
+    requirements: ['admin', 'moderator'],
+  },
   name: 'punish',
   description: 'List, stop or start a punishment for a member.',
   options: [

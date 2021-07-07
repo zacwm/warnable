@@ -3,6 +3,10 @@ const { db } = require('../warnable');
 const moment = require('moment-timezone');
 
 exports.meta = {
+  warnable: {
+    type: 'guild',
+    requirements: ['admin', 'moderator'],
+  },
   name: 'unwarn',
   description: 'Removes a warning from a member.',
   options: [

@@ -5,6 +5,10 @@ const { db } = require('../warnable');
 const moment = require('moment-timezone');
 
 exports.meta = {
+  warnable: {
+    type: 'guild',
+    requirements: ['admin', 'moderator', 'viewer'],
+  },
   name: 'list',
   description: 'Displays a list of the members warnings.',
   options: [

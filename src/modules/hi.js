@@ -4,6 +4,9 @@ const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 
 exports.meta = {
+  warnable: {
+    type: 'global',
+  },
   name: 'hi',
   description: 'Replies with hello back!',
 };

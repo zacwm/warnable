@@ -5,6 +5,10 @@ const { client } = require('../warnable');
 const moment = require('moment-timezone');
 
 exports.meta = {
+  warnable: {
+    type: 'guild',
+    requirements: ['admin', 'moderator'],
+  },
   name: 'tools',
   description: 'Some tools to assist with moderation',
   options: [
