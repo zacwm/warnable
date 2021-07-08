@@ -22,7 +22,7 @@ async function runEvent(event, args) {
     const GlobalCommandData = [];
     for (const module in modules) {
       if (modules[module]['meta']) {
-        var moduleMeta = modules[module].meta;
+        const moduleMeta = modules[module].meta;
         if (moduleMeta.warnable.type == 'global') {
           delete moduleMeta.warnable;
           GlobalCommandData.push(moduleMeta);
@@ -30,7 +30,7 @@ async function runEvent(event, args) {
       }
     }
     client.application.commands.set(GlobalCommandData)
-    .then(() => { logs.console('command', `Set ${GlobalCommandData.length} global command${GlobalCommandData.length > 1 ? 's' : ''}.`) })
+    .then(() => { logs.console('command', `Set ${GlobalCommandData.length} global command${GlobalCommandData.length == 1 ? 's' : ''}.`); })
     .catch(console.error);
 
     // Set Guild Commands
@@ -42,23 +42,22 @@ async function runEvent(event, args) {
         for (const module in modules) {
           try {
             if (modules[module]['meta']) {
-              var moduleMeta = modules[module].meta;
-              delete moduleMeta.warnable;
-              moduleMeta.permissions = [];
+              const ServerModuleMeta = modules[module].meta;
+              ServerModuleMeta.permissions = [];
               if (modules[module].meta.warnable) {
                 if (modules[module].meta.warnable.type === 'guild' && modules[module].meta.warnable.requirements) {
                   modules[module].meta.warnable.requirements.forEach((reqType) => {
                     if (roleData[reqType]) {
-                      moduleMeta.permissions.push({
+                      ServerModuleMeta.permissions.push({
                         id: roleData[reqType],
                         type: 'ROLE',
                         permission: true,
                       });
                     }
                   });
-                
-                  delete moduleMeta.warnable;
-                  GuildCommandData.push(moduleMeta);
+
+                  delete ServerModuleMeta.warnable;
+                  GuildCommandData.push(ServerModuleMeta);
                 }
               }
             }
@@ -69,7 +68,7 @@ async function runEvent(event, args) {
           }
         }
         Guild.commands.set(GuildCommandData)
-        .then(() => { logs.console('command', `Set ${GuildCommandData.length} command${GuildCommandData.length > 1 ? 's' : ''} for server: ${serverID}`) })
+        .then(() => { logs.console('command', `Set ${GuildCommandData.length} command${GuildCommandData.length == 1 ? 's' : ''} for server: ${serverID}`); })
         .catch(console.error);
       })
       .catch((GuildFetchError) => {
