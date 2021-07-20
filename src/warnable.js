@@ -34,11 +34,13 @@ catch(err) {
 
 const path = require('path');
 const fs = require('fs');
+const chokidar = require('chokidar');
+const configTest = require('./common/configTest');
 const { Client, Intents } = require('discord.js');
 exports.client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS] });
 exports.modules = {};
 exports.logs = require('./common/logs');
-process.servers = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json'))).servers;
+// process.servers = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json'))).servers;
 require('./common/events');
 require('dotenv').config();
 
@@ -56,7 +58,8 @@ require('dotenv').config();
   });
 })();
 
-// # Servers Config File Changes
+/*
+// # Servers Config File Changes -- old
 fs.watchFile(path.join(__dirname, './servers.json'), () => {
   try {
     const newFile = JSON.parse(fs.readFileSync(path.join(__dirname, './servers.json')));
@@ -68,5 +71,59 @@ fs.watchFile(path.join(__dirname, './servers.json'), () => {
     this.logs.console('error', 'Failed to load the updated server.json config! Using previous changes...');
   }
 });
+*/
 
-this.client.login(process.env.TOKEN);
+// # Watch server config files.
+chokidar.watch(path.join(__dirname, './configs/servers'))
+  .on('add', (dir) => {
+    const FileDirArray = dir.split('\\');
+    const FileName = FileDirArray[FileDirArray.length - 1];
+    const ServerID = FileName.replace('.json', '');
+    if (/\d+\.json/.test(FileName)) {
+      const FileData = JSON.parse(fs.readFileSync(dir));
+      configTest(FileData)
+      .then(() => {
+        if (!process.servers) process.servers = {};
+        process.servers[ServerID] = FileData;
+        this.logs.console('config', `Updated server config for '${ServerID}'`);
+      })
+      .catch((errReason) => {
+        this.logs.console('config', `FAILED to load server config for '${ServerID}'. Reason: ${errReason}`);
+      });
+    }
+    else {
+      this.logs.console('config', `FAILED to load server config file '${FileName}'. Reason: Invalid server ID for file name.`);
+    }
+  })
+  .on('change', (dir) => {
+    const FileDirArray = dir.split('\\');
+    const FileName = FileDirArray[FileDirArray.length - 1];
+    const ServerID = FileName.replace('.json', '');
+    if (/\d+\.json/.test(FileName)) {
+      const FileData = JSON.parse(fs.readFileSync(dir));
+      configTest(FileData)
+      .then(() => {
+        if (!process.servers) process.servers = {};
+        process.servers[ServerID] = FileData;
+        this.logs.console('config', `Updated server config for '${ServerID}'`);
+      })
+      .catch((errReason) => {
+        this.logs.console('config', `FAILED to load server config for '${ServerID}'. Reason: ${errReason}`);
+      });
+    }
+    else {
+      this.logs.console('config', `FAILED to load server config file '${FileName}'. Reason: Invalid server ID for file name.`);
+    }
+  })
+  .on('unlink', (dir) => {
+    if (process.servers) {
+      const FileDirArray = dir.split('\\');
+      const ServerID = FileDirArray[FileDirArray.length - 1].replace('.json', '');
+      if (process.servers[ServerID]) {
+        delete process.servers[ServerID];
+        this.logs.console('config', `Config for server '${ServerID}' was deleted.`);
+      }
+    }
+  });
+
+this.client.login(process.env.TOKEN || require('./configs/config.json').token);

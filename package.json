@@ -13,13 +13,17 @@
   "dependencies": {
     "better-sqlite3": "^7.4.0",
     "chalk": "^4.1.1",
+    "chokidar": "^3.5.2",
     "directory-tree": "^2.2.9",
-    "discord.js": "^13.0.0-dev.f7eeccba4b7015496df811f10cc2da2b0fab0630",
+    "discord.js": "^13.0.0-dev.02f55f0.1626742085",
     "dotenv": "^9.0.2",
-    "eslint": "^7.26.0",
     "fetch": "^1.1.0",
     "moment-timezone": "^0.5.33",
     "mongoose": "^5.12.13",
     "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "eslint": "^7.31.0",
+    "eslint-config-xo": "^0.37.0"
   }
 }
