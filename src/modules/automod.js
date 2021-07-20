@@ -4,7 +4,7 @@ const { logs, client, db } = require('../warnable');
 const { pointCheck } = require('../common/punishments');
 const { MessageEmbed } = require('discord.js');
 
-exports.message = checkMessage;
+exports.messageCreate = checkMessage;
 exports.messageUpdate = function messageUpdate(_msgOld, msgNew) {
   checkMessage(msgNew);
 };

@@ -1,6 +1,6 @@
 // scuffed command because its used for dev stuff.
 
-exports.message = (msg) => {
+exports.messageCreate = (msg) => {
   if (msg.author.bot) return;
   if (msg.content.startsWith('!eval')) {
     if (process.env.BOTADMINS.split(',').includes(msg.author.id)) {

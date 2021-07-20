@@ -37,7 +37,7 @@ exports.meta = {
   ],
 };
 
-exports.interaction = async (interaction) => {
+exports.interactionCreate = async (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
     const serverConfig = process.servers[interaction.guildID];

@@ -11,7 +11,7 @@ exports.meta = {
   description: 'Replies with hello back!',
 };
 
-exports.interaction = (interaction) => {
+exports.interactionCreate = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
     fetch('http://aws.random.cat/meow')

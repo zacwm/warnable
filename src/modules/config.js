@@ -11,7 +11,7 @@ exports.meta = {
   description: 'Updates the servers configuration settings.',
 };
 
-exports.interaction = (interaction) => {
+exports.interactionCreate = (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
     const embedMessage = new MessageEmbed()

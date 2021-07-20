@@ -4,7 +4,7 @@
 const { client, modules, logs } = require('../warnable');
 const punishments = require('./punishments');
 
-const events = ['ready', 'message', 'messageUpdate', 'interaction', 'guildMemberAdd', 'guildMemberRemove'];
+const events = ['ready', 'messageCreate', 'messageUpdate', 'interactionCreate', 'guildMemberAdd', 'guildMemberRemove'];
 events.forEach((event) => {
   client.on(event, (...args) => {
     runEvent(event, args);
@@ -83,8 +83,8 @@ async function runEvent(event, args) {
     }, 10000);
   }
 
-  if (event === 'interaction') {
-    logs.console('command', `Interaction${args[0].isCommand() ? ` '${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
+  if (event === 'interactionCreate') {
+    logs.console('interaction', `Interaction${args[0].isCommand() ? ` '${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
   }
 
   // Command file events...

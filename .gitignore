@@ -1,5 +1,5 @@
 /node_modules
 .env
 *.db
-servers.json
 database.js
+/configs/config.json
