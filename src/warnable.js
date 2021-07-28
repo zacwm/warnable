@@ -45,10 +45,10 @@ function pointsActions(guildid, action, user) {
     if (action.type == "ban") {
         if (action.timer) { // Temp ban
             user.member.ban({ reason: `[warnable] Temp > Reaching ${user.points} warning points` })
-            .then(() => { 
+            .then(() => {
                 temp[user.member.id] = {
                     type: "ban",
-                    timeout: setTimeout(() => { 
+                    timeout: setTimeout(() => {
                         user.member.guild.members.unban(user.member.id)
                         .then(() => {
                             delete temp[user.member.id];
@@ -60,7 +60,7 @@ function pointsActions(guildid, action, user) {
                         });
                     }, moment(0).add(parseInt(action.timer.replace(/[^\d]/g, "")), action.timer.replace(/\d/g, "")).valueOf())
                 }
-                makeLog(guildid, "important", `🔨 ${user.member.user.tag} was **temp-banned** for reaching ${user.points} warning points.`); 
+                makeLog(guildid, "important", `🔨 ${user.member.user.tag} was **temp-banned** for reaching ${user.points} warning points.`);
             })
             .catch(err => {
                 console.error(err);
@@ -69,8 +69,8 @@ function pointsActions(guildid, action, user) {
         }
         else { // Perm ban
             user.member.ban({ reason: `[warnable] Reaching ${user.points} warning points` })
-            .then(() => { 
-                makeLog(guildid, "important", `🔨 ${user.member.user.tag} was **banned** for reaching ${user.points} warning points.`); 
+            .then(() => {
+                makeLog(guildid, "important", `🔨 ${user.member.user.tag} was **banned** for reaching ${user.points} warning points.`);
             })
             .catch(err => {
                 console.error(err);
@@ -93,10 +93,10 @@ function pointsActions(guildid, action, user) {
     if (action.type == "mute") {
         if (action.timer) { // Temp mute
             user.member.roles.add(config.guilds[guildid].roles.mute, `[warnable] Reaching ${user.points} warning points. Time: ${action.timer}`)
-            .then(() => { 
+            .then(() => {
                 temp[user.member.id] = {
                     type: "mute",
-                    timeout: setTimeout(() => { 
+                    timeout: setTimeout(() => {
                         user.member.roles.remove(config.guilds[guildid].roles.mute, `[warnable] Temp timer of ${action.timer} is up.`)
                         .then(() => {
                             delete temp[user.member.id];
@@ -104,11 +104,11 @@ function pointsActions(guildid, action, user) {
                         })
                         .catch(unmuteerr => {
                             console.error(unmuteerr);
-                            makeLog(guildid, "important", `⚠️ ${user.member.user.tag} was attempted to be **unmuted** because timer was up, **but there was an issue.**`); 
+                            makeLog(guildid, "important", `⚠️ ${user.member.user.tag} was attempted to be **unmuted** because timer was up, **but there was an issue.**`);
                         });
                     }, moment(0).add(parseInt(action.timer.replace(/[^\d]/g, "")), action.timer.replace(/\d/g, "")).valueOf())
                 }
-                makeLog(guildid, "important", `🤫 ${user.member.user.tag} was **temp-muted** for reaching ${user.points} warning points.`); 
+                makeLog(guildid, "important", `🤫 ${user.member.user.tag} was **temp-muted** for reaching ${user.points} warning points.`);
             })
             .catch(err => {
                 console.error(err);
@@ -117,7 +117,7 @@ function pointsActions(guildid, action, user) {
         else { // Perm mute
             user.member.roles.add(config.guilds[guildid].roles.mute, `[warnable] Reaching ${user.points} warning points. Time: ∞`)
             .then(() => {
-                makeLog(guildid, "important", `🤫 ${user.member.user.tag} was **muted** for reaching ${user.points} warning points.`); 
+                makeLog(guildid, "important", `🤫 ${user.member.user.tag} was **muted** for reaching ${user.points} warning points.`);
             })
             .catch(err => {
                 console.error(err);

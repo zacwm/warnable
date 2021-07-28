@@ -52,7 +52,7 @@ module.exports = class db {
         return new Promise((resolve, reject) => {
             try {
                 pos = (!user) ? -1 : (pos - 1) * -1;
-                user = (!user) ? this.db.getData(`/guilds/${guild}/last`) : user; 
+                user = (!user) ? this.db.getData(`/guilds/${guild}/last`) : user;
                 if (!user) this.db.delete(`/guilds/${guild}/last`);
                 this.db.delete(`/guilds/${guild}/users/${user}/warnings[${pos}]`);
                 resolve(user);

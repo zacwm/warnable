@@ -19,7 +19,7 @@ Version 2.0.7<br/>
 ## Commands
 All commands start with the prefix & can only be used by admins that are both set in the config | () = Required, [] = Optional
 ### `warn (@user) (points) [reason]`
-Adds warning points to the user. 
+Adds warning points to the user.
 User must be mentioned (Still possible to mention with ID if user is not in the guild/server). If no reason is provided, it will set the reason to "No reason provided".
 
 ### `remove (@user) [number]` | `remove last`

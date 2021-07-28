@@ -7,7 +7,7 @@ module.exports = {
     guilds: { // Guilds must be added in here for the bot to work in.
         "guild-id": {
             points: [ // Actions for if a user reaches above any point values.
-                // Range: The range of points for the action to trigger; Points must be lower number then higher number. 
+                // Range: The range of points for the action to trigger; Points must be lower number then higher number.
                 // Message: "%guild" = The server name / "%points" = Their total points value when the action took place.
                 // Leave message blank ("") to disable.
                 {
@@ -31,7 +31,7 @@ module.exports = {
                     message: "You have been permanently banned in %guild for reaching %points"
                 }
             ],
-            directmessage: "⚠ **You have been warned!** ⚠\n> You recieved %points point(s) for `%reason`.\n> You now have a total of %total point(s).", // Direct message the user whenever warned. "" to disable. 
+            directmessage: "⚠ **You have been warned!** ⚠\n> You recieved %points point(s) for `%reason`.\n> You now have a total of %total point(s).", // Direct message the user whenever warned. "" to disable.
             // "\n" = next line. "%points" = points warned, "%total" = their total points, "%reason" = the reason they were warned.
             roles: { // Role ID's for the guild.
                 mute: "", // Used for the mute function.
