@@ -36,16 +36,17 @@ exports.meta = {
 exports.interactionCreate = async (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    const serverConfig = process.servers[interaction.guildID];
+    const serverConfig = process.servers[interaction.guildId];
+    console.dir(interaction.options.get('reason'));
     if (serverConfig) {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
         if (interaction.options.get('user').value.match(/\d+/g)) {
-          const wGuildID = interaction.guildID;
+          const wGuildID = interaction.guildId;
           const wUserID = interaction.options.get('user').value.match(/\d+/g)[0];
           const wPoints = parseInt(interaction.options.get('points').value);
           const wIssuerID = interaction.user.id;
-          const wReason = interaction.options.has('reason') ? interaction.options.get('reason').value : 'No reason provied.';
+          const wReason = interaction.options.get('reason') ? interaction.options.get('reason').value : 'No reason provied.';
           const wTime = (new Date(new Date().toUTCString()).getTime() / 1000).toString();
 
           db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason, wTime)

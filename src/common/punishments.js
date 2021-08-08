@@ -131,7 +131,14 @@ exports.check = (guild) => {
       if (parseInt(punishment.unixFinish) > 0 && parseInt(punishment.unixFinish) <= moment().unix()) {
         if (!finishedPunishments[punishment.guild]) finishedPunishments[punishment.guild] = [];
         finishedPunishments[punishment.guild].push(`- <@${punishment.user}> (${punishment.user}) **| Type:** ${punishment.type}`);
-        this.stop(punishment.guild, punishment.user, '[punish] Temp-timer concluded.');
+        this.stop(punishment.guild, punishment.user, '[punish] Temp-timer concluded.')
+        .catch((err) => {
+          logs.guild(guild, 'main', {
+            title: 'Punishment error.',
+            description: `Something failed when running the stop punishment tasks for <@${punishment.user}> (\`${punishment.user}\`)\n**Details: **\`${err.reason || 'Unknown'}\``,
+            color: 0xe74c3c,
+          });
+        });
       }
     });
     for (const server in finishedPunishments) {

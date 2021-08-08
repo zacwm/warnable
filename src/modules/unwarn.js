@@ -40,19 +40,19 @@ exports.meta = {
 exports.interactionCreate = async (interaction) => {
   if (!interaction.isCommand()) return;
 	if (interaction.commandName === this.meta.name) {
-    const serverConfig = process.servers[interaction.guildID];
+    const serverConfig = process.servers[interaction.guildId];
     if (serverConfig) {
       const member = await interaction.member.fetch();
       if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator].includes(role.id)) !== undefined) {
 
         // # sub-cmd = last
-        if (interaction.options.has('last')) {
+        if (interaction.options.getSubcommand() === 'last') {
           if (!process.lastWarnings) process.lastWarnings = {};
-          if (!process.lastWarnings[interaction.guildID]) process.lastWarnings[interaction.guildID] = [];
-          if (process.lastWarnings[interaction.guildID].length > 0) {
-            const removedWarning = process.lastWarnings[interaction.guildID].shift();
+          if (!process.lastWarnings[interaction.guildId]) process.lastWarnings[interaction.guildId] = [];
+          if (process.lastWarnings[interaction.guildId].length > 0) {
+            const removedWarning = process.lastWarnings[interaction.guildId].shift();
             if (removedWarning) {
-              db.removeWarning(interaction.guildID, removedWarning.user, removedWarning.time)
+              db.removeWarning(interaction.guildId, removedWarning.user, removedWarning.time)
               .then(() => {
                 interaction.reply({ embeds: [
                   new MessageEmbed()
@@ -80,16 +80,15 @@ exports.interactionCreate = async (interaction) => {
         }
 
         // # sub-cmd = member
-        else if (interaction.options.has('member')) {
-          const subOptsMember = interaction.options.get('member').options;
-          if (subOptsMember.get('user').value.match(/\d+/g)) {
+        else if (interaction.options.getSubcommand() === 'member') {
+          if (interaction.options.get('user').value.match(/\d+/g)) {
             db.listWarnings(
-              interaction.guildID,
-              subOptsMember.get('user').value.match(/\d+/g)[0],
+              interaction.guildId,
+              interaction.options.get('user').value.match(/\d+/g)[0],
             )
             .then((v) => {
               v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
-              const warningNum = subOptsMember.get('number').value;
+              const warningNum = interaction.options.get('number').value;
               if (warningNum > 0 && v.length >= warningNum) {
                 /*
                  * Heads up to whoever is looking at this :----------)
@@ -97,8 +96,8 @@ exports.interactionCreate = async (interaction) => {
                  * but using the sort and unixTime is close enough imo lol, less work for me, the db, and the user kinda...
                  */
                 db.removeWarning(
-                  interaction.guildID,
-                  subOptsMember.get('user').value.match(/\d+/g)[0],
+                  interaction.guildId,
+                  interaction.options.get('user').value.match(/\d+/g)[0],
                   v[warningNum - 1].unixTime,
                 )
                 .then(() => {
