@@ -65,7 +65,7 @@ exports.interactionCreate = async (interaction) => {
 
               if (pointTotal && wPoints > 0) pointCheck(wGuildID, wUserID, pointTotal, wIssuerID);
 
-              logs.guild(interaction.guildID, 'main', {
+              logs.guild(wGuildID, 'main', {
                 title: 'New warning',
                 description: descString + `\n**Issuer:** <@${wIssuerID}>`,
                 color: 0xf39c12,

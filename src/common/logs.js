@@ -45,9 +45,3 @@ exports.guild = ((guild, type, content) => {
     this.console('logs', `Failed to log to the '${type}' channel for server '${guild}'. Error@Channel`);
   });
 });
-
-// Other
-
-/* function discordContentToConsole(str) {
-
-} */
