@@ -20,7 +20,8 @@
     "fetch": "^1.1.0",
     "moment-timezone": "^0.5.33",
     "mongoose": "^5.12.13",
-    "mysql2": "^2.2.5"
+    "mysql2": "^2.2.5",
+    "promise-mysql": "^5.0.3"
   },
   "devDependencies": {
     "eslint": "^7.31.0",
