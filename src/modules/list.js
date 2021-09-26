@@ -48,7 +48,7 @@ exports.interactionCreate = async (interaction) => {
                 interaction.reply({ embeds: [
                   new MessageEmbed()
                   .setTitle(`Warnings for ${v[0].user} | Total points: ${v.reduce((prev, val) => prev + val.points, 0)}`)
-                  .setDescription(`${arrayChunks[page].map((warning, index) => `**${(page * 5) + (index + 1)}) ${warning.reason}**\n└  ‎Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.unixTime && warning.unixTime !== 0) ? moment.unix(warning.unixTime).utc().tz(serverConfig.timezone || 'UTC').format('MMMM Do YYYY, h:mm a') : 'Unknown'}`).join('\n\n')}`)
+                  .setDescription(`${arrayChunks[page].map((warning, index) => `**${(page * 5) + (index + 1)}) ${warning.reason}**\n└  ‎*Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.unixTime && warning.unixTime !== 0) ? `<t:${warning.unixTime}:f>` : 'Unknown'}*`).join('\n\n')}`)
                   .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : ''),
                 ], ephemeral: true });
               }
