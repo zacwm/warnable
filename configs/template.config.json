@@ -1,4 +1,5 @@
 {
   "token": "Discord Bot Token",
-  "console-webhook": ""
+  "console-webhook": "",
+  "enable-editor": false
 }

@@ -1,8 +1,7 @@
 // # warnable v3-dev | Command
 
 const { MessageEmbed } = require('discord.js');
-const { db } = require('../warnable');
-const moment = require('moment-timezone');
+const WarningsDB = require('../database/Warnings');
 
 exports.meta = {
   warnable: {
@@ -29,66 +28,55 @@ exports.meta = {
 
 exports.interactionCreate = async (interaction) => {
   if (!interaction.isCommand()) return;
-	if (interaction.commandName === this.meta.name) {
-    const serverConfig = process.servers[interaction.guildId];
-    if (serverConfig) {
-      const member = await interaction.member.fetch();
-      if (member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id)) !== undefined) {
-        if (interaction.options.get('user').value.match(/\d+/g)) {
-          db.listWarnings(
-            interaction.guildId,
-            interaction.options.get('user').value.match(/\d+/g)[0],
-          )
-          .then((v) => {
-            if (v.length > 0) {
-              v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
-              const arrayChunks = Array(Math.ceil(v.length / 5)).fill().map((_, index) => index * 5).map(begin => v.slice(begin, begin + 5));
-              const page = interaction.options.get('page') ? interaction.options.get('page').value - 1 : 0;
-              if (page > -1 && arrayChunks.length > page) {
-                interaction.reply({ embeds: [
-                  new MessageEmbed()
-                  .setTitle(`Warnings for ${v[0].user} | Total points: ${v.reduce((prev, val) => prev + val.points, 0)}`)
-                  .setDescription(`${arrayChunks[page].map((warning, index) => `**${(page * 5) + (index + 1)}) ${warning.reason}**\n└  ‎*Points: ${warning.points}‎ | By: <@${warning.issuer}> | Time: ${(warning.unixTime && warning.unixTime !== 0) ? `<t:${warning.unixTime}:f>` : 'Unknown'}*`).join('\n\n')}`)
-                  .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : ''),
-                ], ephemeral: true });
-              }
-              else {
-                interaction.reply({ embeds: [
-                  new MessageEmbed()
-                  .setDescription('Invalid page number.'),
-                ], ephemeral: true });
-              }
-            }
-            else {
-              interaction.reply({ embeds: [
-                new MessageEmbed()
-                .setDescription('No warnings to show for this member!'),
-              ], ephemeral: true });
-            }
-          }).catch((vErr) => {
-            console.error(vErr);
-            const embedMessage = new MessageEmbed()
-            .setDescription('Something failed...');
-            interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-          });
-        }
-        else {
-          const embedMessage = new MessageEmbed()
-          .setDescription('An invalid mention or ID was provided.');
-          interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-        }
-      }
-      else {
-        interaction.reply({ embeds: [
-          new MessageEmbed()
-          .setDescription('You don\'t have permission to use this command.'),
-        ], ephemeral: true });
-      }
-    }
-    else {
-      const embedMessage = new MessageEmbed()
-      .setDescription('This server isn\'t configured by the bot admin.');
-      interaction.reply({ embeds: [ embedMessage ], ephemeral: true });
-    }
+	if (interaction.commandName !== this.meta.name) return;
+  const serverConfig = process.servers[interaction.guildId];
+  // Check if server is configued.
+  if (!serverConfig) {
+    return interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setDescription('This server isn\'t configured by the bot admin.'),
+    ], ephemeral: true });
+  }
+  // Check if author has permission to use command.
+  const member = await interaction.member.fetch();
+  if (!member.roles.cache.find(role => [serverConfig.roles.admin, serverConfig.roles.moderator, serverConfig.roles.viewer].includes(role.id))) {
+    return interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setDescription('You don\'t have permission to use this command.'),
+    ], ephemeral: true });
+  }
+  // Check if command has a valid user ID to lookup.
+  if (!interaction.options.get('user').value.match(/\d+/g)) {
+    return interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setDescription('An invalid mention or ID was provided.'),
+    ], ephemeral: true });
+  }
+  // Run list warning query.
+  const userID = interaction.options.get('user').value.match(/\d+/g)[0];
+  const userData = await WarningsDB.findAll({ where: { userID: userID } });
+  if (!userData || userData.length == 0) {
+    return interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setDescription('Member has no warnings.'),
+    ], ephemeral: true });
+  }
+  const v = userData;
+  v.sort((a, b) => { return parseInt(b.unixTime) - parseInt(a.unixTime); });
+  const arrayChunks = Array(Math.ceil(v.length / 5)).fill().map((_, index) => index * 5).map(begin => v.slice(begin, begin + 5));
+  const page = interaction.options.get('page') ? interaction.options.get('page').value - 1 : 0;
+  if (page > -1 && arrayChunks.length > page) {
+    interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setTitle(`Warnings for ${v[0].user} | Total points: ${v.reduce((prev, val) => prev + val.points, 0)}`)
+      .setDescription(`${arrayChunks[page].map((warning) => `**${warning.reason}**\n└ *ID: ${warning.id} | Points: ${warning.points}‎ | By: <@${warning.issuerID}> | Time: ${(warning.unixTime && warning.unixTime !== 0) ? `<t:${warning.unixTime}:f>` : 'Unknown'}*`).join('\n\n')}`)
+      .setFooter(arrayChunks.length > 1 ? `Viewing page ${page + 1} of ${arrayChunks.length}` : ''),
+    ], ephemeral: true });
+  }
+  else {
+    interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setDescription('Invalid page number.'),
+    ], ephemeral: true });
   }
 };

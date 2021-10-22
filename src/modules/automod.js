@@ -1,8 +1,8 @@
 // # warnable v3-dev | Module
 
-const { logs, client, db } = require('../warnable');
-const { pointCheck } = require('../common/punishments');
+const { client } = require('../warnable');
 const { MessageEmbed } = require('discord.js');
+const Warnings = require('../common/warnings');
 
 exports.messageCreate = checkMessage;
 exports.messageUpdate = function messageUpdate(_msgOld, msgNew) {
@@ -22,6 +22,8 @@ function checkMessage(msg) {
     if (serverConfig.automod.invites.enabled) {
       const inviteCodes = msg.content.match(/(https?:\/\/)?(www.)?(discord.(gg|io|me|li)|discordapp.com\/invite)\/[^\s/]+?(?=\b)/gm);
       if (inviteCodes) {
+        // Should probbaly do a check for an actual discord domain invite for checking if whitelisted.
+        // I'll get around to it at some point...
         for (let i = 0; i < inviteCodes.length; i++) {
           client.fetchInvite(inviteCodes[i])
           .then((res) => {
@@ -79,43 +81,18 @@ function runAutomod(msg, type, reasonExtras) {
   }
   // Add warning
   if (automodTypeProps.points) {
-    const wGuildID = msg.guild.id;
-    const wUserID = msg.author.id;
-    const wPoints = automodTypeProps.points || 0;
-    const wIssuerID = client.user.id;
-    let wReason = '[warnable] Automod';
-    const wTime = (new Date(new Date().toUTCString()).getTime() / 1000).toString();
+    const data = {
+      guildID: msg.guild.id,
+      userID: msg.author.id,
+      points: automodTypeProps.points || 0,
+      issuerID: client.user.id,
+      reason: '[warnable] Automod' + (type == 'invites' ? `Discord invite (${reasonExtras}) in #${msg.channel.name}` : ''),
+      unixTime: (new Date(new Date().toUTCString()).getTime() / 1000).toString(),
+    };
 
-    switch(type) {
-      case 'invites':
-        wReason = `[warnable] Automod - Discord invite (${reasonExtras}) in #${msg.channel.name}`;
-        break;
-    }
-
-    db.addWarning(wGuildID, wUserID, wPoints, wIssuerID, wReason, wTime)
-    .then(async (v) => {
-      if (v) {
-        if (!process.lastWarnings) process.lastWarnings = {};
-        if (!process.lastWarnings[wGuildID]) process.lastWarnings[wGuildID] = [];
-        process.lastWarnings[wGuildID].unshift({ user: wUserID, points: wPoints, issuer: wIssuerID, reason: wReason, time: wTime });
-        if (process.lastWarnings[wGuildID].length > 50) process.lastWarnings[wGuildID].pop();
-
-        const newList = await db.listWarnings(wGuildID, wUserID);
-        const pointTotal = newList.reduce((prev, val) => prev + val.points, 0);
-        const descString = `**Warned:** <@${wUserID}> (${wUserID})`
-        + `\n**Points:** ${wPoints} point${wPoints !== 1 ? 's' : ''} (New total: ${newList.reduce((prev, val) => prev + val.points, 0) || '?'})`
-        + `\n**Reason:** \`${wReason}\``;
-
-        if (pointTotal) pointCheck(wGuildID, wUserID, pointTotal, wIssuerID);
-
-        logs.guild(msg.guild.id, 'main', {
-          title: 'Automod warning',
-          description: descString + `\n**Issuer:** <@${wIssuerID}>`,
-          color: 0xe67e22,
-        });
-      }
-    }).catch(vErr => {
-      console.error(vErr);
+    Warnings.newWarning(data)
+    .catch((err) => {
+      console.warn(err);
     });
   }
 }

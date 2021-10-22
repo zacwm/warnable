@@ -13,22 +13,21 @@ exports.meta = {
 
 exports.interactionCreate = (interaction) => {
   if (!interaction.isCommand()) return;
-	if (interaction.commandName === this.meta.name) {
-    fetch('http://aws.random.cat/meow')
-    .then(res => res.json())
-    .then(json => {
-      interaction.reply({ embeds: [
-        new MessageEmbed()
-        .setTitle('Hello! :)')
-        .setDescription('Here\'s a cat...')
-        .setImage(json.file),
-      ] });
-    })
-    .catch(() => {
-      interaction.reply({ embeds: [
-        new MessageEmbed()
-        .setDescription('Hello! :)'),
-      ] });
-    });
-  }
+	if (interaction.commandName !== this.meta.name) return;
+  fetch('http://aws.random.cat/meow')
+  .then(res => res.json())
+  .then(json => {
+    interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setTitle('Hello! :)')
+      .setDescription('Here\'s a cat...')
+      .setImage(json.file),
+    ] });
+  })
+  .catch(() => {
+    interaction.reply({ embeds: [
+      new MessageEmbed()
+      .setDescription('Hello! :)'),
+    ] });
+  });
 };

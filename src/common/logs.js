@@ -2,7 +2,8 @@
 // Handles logs to the console and/or the guild set log channel.
 
 const { MessageEmbed, WebhookClient } = require('discord.js');
-const { client, config } = require('../warnable');
+const { client } = require('../warnable');
+const config = require('../../configs/config.json');
 let consoleWebhookClient;
 
 (() => {
@@ -17,13 +18,12 @@ exports.console = (name, message) => {
   // Always logs to console.
   console.log(`${name.padStart(10)} | ${message}`);
 
-  if (consoleWebhookClient) {
-    consoleWebhookClient.send({
-      content: `**${name}** | ${message}`,
-    }).then().catch(() => {
-      console.error(`${'webhook'.padStart(10)} | Console Webhook failed to send message.`);
-    });
-  }
+  if (!consoleWebhookClient) return;
+  consoleWebhookClient.send({
+    content: `**${name}** | ${message}`,
+  }).then().catch(() => {
+    console.error(`${'webhook'.padStart(10)} | Console Webhook failed to send message.`);
+  });
 };
 
 /* @ Guild Logs */
