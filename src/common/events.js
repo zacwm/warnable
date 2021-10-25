@@ -86,7 +86,14 @@ async function runEvent(event, args) {
   if (event === 'interactionCreate') {
     logs.console('interaction', `Interaction${args[0].isCommand() ? ` '${args[0].commandName}'` : ''} run by ${args[0].user.tag} (${args[0].user.id})`);
   }
-
+  
+  // Nickname change interval check
+  setInterval(() => {
+    if (isMidnight) {
+      changeNick();
+    }
+  }, 60000);
+  
   // Command file events...
   for(const module in modules) {
     if (modules[module][event]) modules[module][event](...args);
