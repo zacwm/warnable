@@ -1,5 +1,71 @@
-/node_modules
+# Node modules
+node_modules/
+
+# TypeScript output directory
+/dist/
+
+# Environment variables
 .env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS metadata
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+# Editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled binary addons (https://github.com/github/gitignore/pull/4677)
+*.node
+
+# Dependencies installed via npm
+# Automatically added by npm
+# See: https://github.com/npm/npm/blob/master/.gitignore
+# See: https://github.com/npm/npm/pull/1862
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional browserslist cache
+.browserslistrc.cache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Sqlite database
+*.sqlite
 *.db
-database.js
-/configs/config.json
+
+# Next.js builds
+.next

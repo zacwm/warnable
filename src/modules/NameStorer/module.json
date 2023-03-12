@@ -1,0 +1,7 @@
+{
+  "name": "NameStorer",
+  "version": "1.0.0",
+  "library": true,
+  "description": "Manages all names that a user has been seen with.",
+  "main": "index.ts"
+}

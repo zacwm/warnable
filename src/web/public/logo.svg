@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1280"
+   height="200"
+   viewBox="0 0 1280 200"
+   version="1.1"
+   id="svg5"
+   inkscape:export-filename="logo.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="warnable.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="0.66843688"
+     inkscape:cx="758.48598"
+     inkscape:cy="315.66182"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1090">
+      <stop
+         style="stop-color:#e9385b;stop-opacity:1;"
+         offset="0"
+         id="stop1086" />
+      <stop
+         style="stop-color:#e9385b;stop-opacity:0;"
+         offset="1"
+         id="stop1088" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1090"
+       id="linearGradient1092"
+       x1="-275.26907"
+       y1="192.98755"
+       x2="1337.4487"
+       y2="935.01721"
+       gradientUnits="userSpaceOnUse" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1185">
+      <text
+         xml:space="preserve"
+         style="font-size:318.446px;fill:#36393f;stroke-width:1.19417"
+         x="-73.92141"
+         y="644.87885"
+         id="text1189"
+         transform="scale(1.0001059,0.99989412)"><tspan
+           sodipodi:role="line"
+           id="tspan1187"
+           x="-73.92141"
+           y="644.87885"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:318.446px;font-family:'JetBrains Mono';-inkscape-font-specification:'JetBrains Mono Ultra-Bold';stroke-width:1.19417">warnable</tspan></text>
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g1183"
+       transform="matrix(0.79801324,0,0,0.79801324,96.023172,-323.09242)"
+       clip-path="url(#clipPath1185)">
+      <rect
+         style="fill:#566ced;fill-opacity:1;stroke-width:1.48392"
+         id="rect448"
+         width="1668.0708"
+         height="451.80032"
+         x="-161.57098"
+         y="326.134" />
+      <rect
+         style="fill:url(#linearGradient1092);fill-opacity:1;stroke-width:1.48392"
+         id="rect448-5"
+         width="1668.0708"
+         height="451.80032"
+         x="-161.57098"
+         y="326.134" />
+    </g>
+  </g>
+</svg>

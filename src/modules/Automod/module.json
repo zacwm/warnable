@@ -1,0 +1,6 @@
+{
+  "name": "Automod",
+  "version": "1.0.0",
+  "description": "Automod for warnable v3!",
+  "main": "index.ts"
+}

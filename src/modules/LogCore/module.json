@@ -1,0 +1,7 @@
+{
+  "name": "LogCore",
+  "version": "1.0.0",
+  "library": true,
+  "description": "LogCore handles log type notifications to configured channels.",
+  "main": "index.ts"
+}

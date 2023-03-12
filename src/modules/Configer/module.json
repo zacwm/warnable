@@ -1,0 +1,7 @@
+{
+  "name": "Configer",
+  "version": "1.0.0",
+  "library": true,
+  "description": "Config manager for Warnable modules",
+  "main": "index.ts"
+}

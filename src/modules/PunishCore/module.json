@@ -1,0 +1,7 @@
+{
+  "name": "PunishCore",
+  "version": "1.0.0",
+  "library": true,
+  "description": "Manages punishments such as roles, mutes, bans, kicks, etc.",
+  "main": "index.ts"
+}
