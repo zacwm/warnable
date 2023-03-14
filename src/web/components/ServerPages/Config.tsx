@@ -1,9 +1,9 @@
 import { Stack, Text, Paper } from '@mantine/core';
 
-export default function ServerPageMain() {
+export default function ServerPageConfig() {
   return (
     <Stack sx={{ height: '100%' }}>
-      <Text fz={30} fw="bold">Main</Text>
+      <Text fz={30} fw="bold">Config</Text>
       <Paper
         p="md"
         sx={(theme) => ({
@@ -12,7 +12,7 @@ export default function ServerPageMain() {
         })}
         radius={12}
       >
-
+        
       </Paper>
     </Stack>
   )

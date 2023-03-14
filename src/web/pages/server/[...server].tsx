@@ -9,6 +9,8 @@ import SideNav from '../../components/SideNav';
 import ServerPageMain from '../../components/ServerPages/Main';
 import ServerPageWarnings from '../../components/ServerPages/Warnings';
 import ServerPageWarning from '../../components/ServerPages/Warning';
+import ServerPageUsers from '../../components/ServerPages/Users';
+import ServerPageConfig from '../../components/ServerPages/Config';
 import ServerPageUnknown from '../../components/ServerPages/Unknown';
 
 export default function Server() {
@@ -63,6 +65,12 @@ export default function Server() {
       break;
     case 'warning':
       PageComponent = ServerPageWarning;
+      break;
+    case 'users': 
+      PageComponent = ServerPageUsers;
+      break;
+    case 'config':
+      PageComponent = ServerPageConfig;
       break;
     default:
       PageComponent = ServerPageUnknown;
