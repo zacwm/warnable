@@ -65,10 +65,6 @@ export default function ServerPageWarning() {
     loadWarnings();
   }, [guildId, warningId]);
 
-  React.useEffect(() => {
-    console.dir(warningData);
-  }, [warningData]);
-
   return (
     <Stack sx={{ height: '100%' }}>
       <Text fz={30} fw="bold">Warning ID: { warningId }</Text>

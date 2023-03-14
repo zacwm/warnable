@@ -17,10 +17,12 @@ export default {
     if (!interaction.isCommand()) return;
     
     const configer = warnable.modules.Configer.main;
+
+    /*
     const allGuildConfigData = await configer.getAllModuleGuildConfigs(interaction.guildId);
     console.dir(allGuildConfigData);
+    */
     
-    /*
     const LogCoreConfiger = configer.module('LogCore');
 
     if (LogCoreConfiger) {
@@ -30,7 +32,7 @@ export default {
       ]);
       return interaction.reply({ content: 'Done' });
     }
-    */
+    
 
     interaction.reply({ content: 'Ok' });
   },

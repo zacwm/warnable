@@ -42,10 +42,6 @@ export default function ServerPageWarnings({ server }) {
     loadWarnings();
   }, [server]);
 
-  React.useEffect(() => {
-    console.dir([loadingData, loadingError, warnings]);
-  }, [loadingData, loadingError, warnings])
-
   return (
     <Stack sx={{ height: '100%' }}>
       <Text fz={30} fw="bold">Warnings</Text>

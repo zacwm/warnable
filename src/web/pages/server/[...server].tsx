@@ -50,10 +50,6 @@ export default function Server() {
       });
   }, [guildId]);
 
-  React.useEffect(() => {
-    console.dir([loadingData, loadingError, serverNotFound, serverData]);
-  }, [loadingData, loadingError, serverNotFound, serverData]);
-
   let PageComponent = null;
 
   switch (page) {
