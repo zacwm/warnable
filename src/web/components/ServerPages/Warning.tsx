@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 
 import { Stack, Grid, Text, Paper, Loader } from '@mantine/core';
 import Mention from '../Mention';
+import TimeParser from '../TimeParser';
 
 function WarningItem({ span, label, children }: { span: number, label: string, children?: any }) {
   return (
@@ -96,7 +97,7 @@ export default function ServerPageWarning() {
               <Text>{ warningData.points }</Text>
             </WarningItem>
             <WarningItem span={6} label="Issued At">
-              <Text>{ warningData.unixTimestamp }</Text>
+              <TimeParser unix={warningData.unixTimestamp} />
             </WarningItem>
             <WarningItem span={12} label="Reason">
               <Text>{ warningData.reason }</Text>
