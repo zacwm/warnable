@@ -13,20 +13,16 @@ export default function App({
       <MantineProvider
         theme={{
           colorScheme: 'dark',
-          components: {
-            Button: {
-              defaultProps: {
-                sx: {
-                  borderRadius: 12,
-                  backgroundColor: '#5a6be9',
-                  transition: 'background-color 100ms ease-out',
-                  '&:hover': {
-                    backgroundColor: '#7462d1',
-                  }
-                }
+          globalStyles: (theme) => ({
+            '.mantine-Button-root': {
+              borderRadius: 12,
+              backgroundColor: '#cf4277',
+              transition: 'background-color 0.2s ease',
+              '&:hover': {
+                backgroundColor: '#5e69e6',
               },
-            },
-          },
+            }
+          })
         }}
         withGlobalStyles
         withNormalizeCSS

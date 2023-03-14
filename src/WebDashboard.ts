@@ -21,6 +21,7 @@ export default class WebDashboard {
         if (parsedUrl.pathname?.startsWith('/api')) {
           req.modules = modules;
         }
+
         handle(req, res, parsedUrl);
       }).listen(3000, (err?: any) => {
         if (err) throw err;

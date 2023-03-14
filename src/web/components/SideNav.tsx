@@ -5,7 +5,30 @@ import { useRouter } from 'next/router';
 import { Paper, Stack, Image, Box, UnstyledButton, Text, Group, Skeleton } from '@mantine/core';
 import ServerIcon from './ServerIcon';
 
-function NavBox({ loading }: { loading: boolean }) {
+function NavLinkButton({ href, icon, name }: { href: string, icon?: React.ReactNode, name: string }) {
+  const router = useRouter();
+
+  return (
+    <UnstyledButton
+      sx={(theme) => ({
+        display: 'flex',
+        padding: '0.5rem',
+        borderRadius: 12,
+        transition: 'background-color 100ms ease-out',
+        '&:hover': {
+          backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
+        },
+      })}
+      onClick={() => router.push(href, undefined, { shallow: true })}
+    >
+      <Group>
+        <Text fz={18}>{name}</Text>
+      </Group>
+    </UnstyledButton>
+  )
+}
+
+function NavBox({ loading, server }: { loading: boolean, server?: { id: string, name: string, icon: string } }) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -13,7 +36,7 @@ function NavBox({ loading }: { loading: boolean }) {
     <Box
       sx={{
         height: '100vh',
-        padding: '20px 0 20px 20px',
+        padding: 20,
         boxSizing: 'border-box'
       }}
     >
@@ -55,15 +78,15 @@ function NavBox({ loading }: { loading: boolean }) {
               >
                 <Group>
                   <ServerIcon
-                    guildName="Some Server"
-                    guildId="1234567890"
+                    guildName={server?.name}
+                    guildId={server?.id}
                     size={35}
                   />
                   <Stack
                     spacing={0}
                     align="left"
                   >
-                    <Text fz={20}>Some Server</Text>
+                    <Text fz={20}>{ server?.name }</Text>
                   </Stack>
                 </Group>
               </UnstyledButton>
@@ -74,9 +97,13 @@ function NavBox({ loading }: { loading: boolean }) {
               </Group>
             ) }
           </Stack>
-          <Stack sx={{ flex: 1 }} mt="lg">
+          <Stack sx={{ flex: 1 }} spacing={2}>
             { !loading ? (
-              <Text>Hi</Text>
+              <React.Fragment>
+                <NavLinkButton href={`/server/${server?.id}`} name="Main Page" />
+                <NavLinkButton href={`/server/${server?.id}/warnings`} name="Warnings" />
+                <NavLinkButton href={`/server/${server?.id}/config`} name="Config" />
+              </React.Fragment>
             ) : (
               <Stack sx={{ padding: '0 0.5rem' }}>
                 { [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {

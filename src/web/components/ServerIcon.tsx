@@ -1,7 +1,7 @@
 import { Avatar } from '@mantine/core';
 
 export default function ServerIcon({ guildId, iconId, guildName, size }: { guildId: string; iconId?: string; guildName: string, size?: number }) {
-  const firstLetters = guildName.split(' ').map((word) => word[0]);
+  const firstLetters = (guildName || '').split(' ').map((word) => word[0]);
 
   return (
     <Avatar

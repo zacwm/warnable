@@ -1,7 +1,7 @@
 {
   "name": "WarnCore",
   "version": "1.0.0",
-  "dependencies": ["PunishCore"],
+  "dependencies": ["NameStorer", "PunishCore"],
   "library": true,
   "description": "WarnCore is the core for managing warnings and applying punishments.",
   "main": "index.ts"

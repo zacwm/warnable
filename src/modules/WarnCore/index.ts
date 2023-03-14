@@ -4,27 +4,77 @@ import WarningModel from './models/Warning';
 
 let warnable: WarnableModule;
 
-const FetchUserWarnings = async (userId: string, guildId?: string) => {
+const fillNames = async (warnings: any[]) => {
+  // Get all unique user id's from userId and issuerId and map to object with id as key
+  const uniqueUserIds: any[] = [...new Set(warnings.map((warning: any) => warning.userId).concat(warnings.map((warning: any) => warning.issuerId)))];
+  const UserIdsToNames: any = {};
+  
+  // Fetch all users from the unique user id's with NameStorer
+  const NameStorer = warnable.modules.NameStorer.main;
+  
+  for (const userId of uniqueUserIds) {
+    const user = await NameStorer.FetchLastSeenName(userId, true);
+    UserIdsToNames[userId] = user;
+  }
+  
+  const parsedWarnings = [];
+  // Fill the warnings with the user names (if userId is found then a new key of userName is added to the warning object)
+  for (const warning of warnings) {
+    const userName = UserIdsToNames[warning.userId];
+    const issuerName = UserIdsToNames[warning.issuerId];
+    
+    parsedWarnings.push({
+      ...warning.toJSON(),
+      userName,
+      issuerName,
+    });
+  }
+  
+  return parsedWarnings;
+}
+
+const FetchUserWarnings = async (userId: string, guildId?: string, fillName?: boolean, sortOldToNew?: boolean) => {
   const warnings = await WarningModel.findAll({
     where: guildId ? { userId, guildId, deleted: false } : { userId },
+    order: [ ['id', sortOldToNew ? 'DESC' : 'ASC'] ],
   });
 
-  return warnings;
+  if (fillName) {
+    const filledNameWarnings = await fillNames(warnings);
+    return filledNameWarnings;
+  }
+
+  return warnings.toJSON();
 };
 
-const FetchGuildWarnings = async (guildId: string, limit: number) => {
-  const warnings = await WarningModel.findAll({
+const FetchGuildWarnings = async (guildId: string, limit: number, fillName?: boolean, sortOldToNew?: boolean) => {
+  const warnings: any = await WarningModel.findAll({
     where: { guildId },
     limit,
+    order: [ ['id', sortOldToNew ? 'ASC' : 'DESC'] ],
   });
 
-  return warnings;
+  if (fillName) {
+    const filledNameWarnings = await fillNames(warnings);
+    return filledNameWarnings;
+  }
+
+  return warnings.toJSON();
 };
 
-const FetchWarningById = async (warningId: string) => {
+const FetchWarningById = async (warningId: string, fillName?: boolean) => {
   const warning = await WarningModel.findByPk(warningId);
 
-  return warning;
+  if (!warning) {
+    return null;
+  }
+
+  if (fillName) {
+    const parsedWarning = await fillNames([warning]);
+    return parsedWarning[0];
+  }
+
+  return warning.toJSON();
 };
 
 const CreateNewWarning = async (guildId: string, userId: string, issuerId: string, points: number, reason: string, unixTimestamp?: number) => {

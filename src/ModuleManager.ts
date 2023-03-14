@@ -25,15 +25,18 @@ interface ModuleItem {
 export interface WarnableModule {
   client: DiscordClient;
   modules: Record<string, ModuleItem>;
+  unloadedModules: string[];
 }
 
 class ModuleManager implements ModuleManagerInterface {
   client: DiscordClient;
   modules: Record<string, ModuleItem>;
+  unloadedModules: string[];
 
   constructor(client: DiscordClient) {
     this.client = client;
     this.modules = {};
+    this.unloadedModules = [];
   }
 
   async load(): Promise<void> {
@@ -154,6 +157,7 @@ class ModuleManager implements ModuleManagerInterface {
         console.info(`Successfully loaded ${LoadedModules.length} modules.`);
         if (FailedModules.length) {
           console.warn(`Failed to load ${FailedModules.length} modules: ${FailedModules.join(', ')}`);
+          this.unloadedModules = FailedModules;
         }
         this.createEventHandlers();
         resolve();
@@ -210,7 +214,7 @@ class ModuleManager implements ModuleManagerInterface {
       });
     });
 
-    this.onEvent('WarnableInit');
+    this.onEvent('WarnableReady');
   }
 
   onEvent(event: string, ...args: any[]): void {
@@ -225,9 +229,10 @@ class ModuleManager implements ModuleManagerInterface {
         if (!module.slashCommands.find((c: any) => c.name === args[0].commandName)) return;
       }
 
-      const warnable = {
+      const warnable: WarnableModule = {
         client: this.client,
         modules: this.modules,
+        unloadedModules: this.unloadedModules,
       };
 
       module.main[event](warnable, ...args);
