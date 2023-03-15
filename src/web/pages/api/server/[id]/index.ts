@@ -59,11 +59,27 @@ export default async function handler(req, res) {
     if (!ConfigerModule) return res.status(500).json({ error: 'Configer module error' });
     const GuildConfig = ConfigerModule.getAllModuleGuildConfigs(id);
 
+    const channels = await guild.channels.fetch();
+
+    const parseTypeNumToString = (type: number) => {
+      switch (type) {
+        case 0: return 'textChannel';
+        case 2: return 'voiceChannel';
+        case 4: return 'category';
+        default: return 'unknown';
+      }
+    }
+
     const guildData = {
       id: guild.id,
       name: guild.name,
       icon: guild.iconURL({ dynamic: true }),
       config: GuildConfig,
+      channels: channels.map((c) => ({
+        id: c.id,
+        name: c.name,
+        type: parseTypeNumToString(c.type),
+      }))
     };
 
     return res.status(200).json(guildData);

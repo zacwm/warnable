@@ -11,10 +11,25 @@ export default async function handler(req, res) {
     const ConfigerModule = req.modules?.modules['Configer']?.main;
     if (!ConfigerModule) return res.status(500).json({ error: 'Configer module error' });
 
-    const guildConfig = await ConfigerModule.getEditableItemsWithValues(id);
-    if (!guildConfig) return res.status(500).json({ error: 'Guild config error' });
+    const configItems = await ConfigerModule.getEditableItems();
+    if (!configItems) return res.status(500).json({ error: 'Guild config error' });
 
-    return res.status(200).json(guildConfig);
+    const configValues = await ConfigerModule.getAllModuleGuildConfigs(id);
+    if (!configValues) return res.status(500).json({ error: 'Guild config error' });
+
+    // Parse values based on configItems
+    let valuesParsed = {};
+    for (const category in configItems) {
+      valuesParsed[category] = {};
+      for (const item of configItems[category]) {
+        valuesParsed[category][item.key] = configValues[item.module][item.key];
+      }
+    }
+
+    return res.status(200).json({
+      configItems,
+      configValues: valuesParsed,
+    });
   }
 
   res.status(401).json({ error: 'Unauthorized' });

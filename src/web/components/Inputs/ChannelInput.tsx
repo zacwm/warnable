@@ -56,7 +56,7 @@ const SelectItem = React.forwardRef((props: any, ref: any) => {
 });
 
 
-export default function ChannelInput({ channels, multiple, filter, value, onChange }: { channels: any[], multiple?: boolean, filter?: string, value: string[] | string, onChange: any }) {
+export default function ChannelInput({ channels, multiple, filter, value, onChange }: { channels: any[], multiple?: boolean, filter?: string, value: string, onChange: any }) {
   const filteredChannels = channels.filter(channel => {
     if (filter === 'textChannel') {
       return channel.type === 'textChannel';
@@ -68,7 +68,7 @@ export default function ChannelInput({ channels, multiple, filter, value, onChan
 
   const handleChange = (val: any) => {
     if (multiple) {
-      onChange(val);
+      onChange(val.join(','));
     } else {
       onChange(val[0]);
     }
@@ -77,7 +77,7 @@ export default function ChannelInput({ channels, multiple, filter, value, onChan
   return (
     <MultiSelect
       placeholder="Select channel"
-      value={Array.isArray(value) ? value : [value]}
+      value={(value || '').split(',')}
       onChange={handleChange}
       itemComponent={SelectItem}
       valueComponent={({ value, onRemove }) => ValueItem(channels.find(i => value === i.id), onRemove)}

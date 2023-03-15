@@ -1,12 +1,15 @@
 import * as React from 'react';
 
-import { Accordion, Stack, Text, Loader } from '@mantine/core';
+import { useSetState } from '@mantine/hooks';
+import { Accordion, Stack, Text, Loader, Grid } from '@mantine/core';
 import ChannelInput from '../Inputs/ChannelInput';
 
 export default function ServerPageConfig({ server }) {
   const [loadingData, setLoadingData] = React.useState(false);
   const [dataError, setDataError] = React.useState(false);
-  const [configData, setConfigData] = React.useState({});
+  const [configData, setConfigData] = React.useState<any>({});
+
+  const [state, setState] = useSetState({ name: 'John', age: 35, job: 'Engineer' });
 
   const fetchData = async () => {
     if (loadingData) return;
@@ -25,6 +28,7 @@ export default function ServerPageConfig({ server }) {
       })
       .then(data => {
         setConfigData(data);
+        setState(data.configValues);
       })
       .catch(err => {
         console.error(err);
@@ -51,7 +55,7 @@ export default function ServerPageConfig({ server }) {
           <Stack justify="center" align="center" style={{ flex: 1 }}>
             <Loader size="lg" />
           </Stack>
-        ) : dataError || Object.keys(configData).length == 0 ? (
+        ) : dataError || Object.keys(configData?.configItems || {}).length == 0 ? (
           <Text>Failed to load warning data</Text>
         ) : (
           <Accordion
@@ -63,25 +67,42 @@ export default function ServerPageConfig({ server }) {
             }}
           >
             {
-              Object.keys(configData).map(key => {
+              Object.keys(configData.configItems).map(key => {
+                const categoryState = state[key];
                 return (
                   <Accordion.Item value={key}>
                     <Accordion.Control>
                       <Text fz={18}>{ key }</Text>
                     </Accordion.Control>
                     <Accordion.Panel>
-                      <ChannelInput
-                        channels={[
-                          { id: '1', name: 'test', type: 'textChannel' },
-                          { id: '2', name: 'hello', type: 'textChannel' },
-                          { id: '3', name: 'yes', type: 'voiceChannel' }
-                        ]}
-                        multiple={true}
-                        value={['1', '2']}
-                        onChange={value => {
-                          console.dir(value);
-                        }}
-                      />
+                      <Grid>
+                        {
+                          configData.configItems[key].map(item => {
+                            const value = categoryState ? categoryState[item.key] : undefined;
+                            return (
+                              <Grid.Col span={6}>
+                                <Text>{ item.name }</Text>
+                                <ChannelInput
+                                  channels={server.channels}
+                                  filter={item.type}
+                                  value={value}
+                                  onChange={value => {
+                                    setState(prev => {
+                                      return {
+                                        ...prev,
+                                        [key]: {
+                                          ...prev[key],
+                                          [item.key]: value
+                                        }
+                                      }
+                                    });
+                                  }}
+                                />
+                              </Grid.Col>
+                            );
+                          })
+                        }
+                      </Grid>
                     </Accordion.Panel>
                   </Accordion.Item>
                 );

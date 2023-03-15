@@ -50,6 +50,10 @@ export default function Server() {
       });
   }, [guildId]);
 
+  React.useEffect(() => {
+    console.dir(serverData);
+  }, [serverData]);
+
   let PageComponent = null;
 
   switch (page) {

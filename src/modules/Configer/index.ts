@@ -1,5 +1,3 @@
-import { Model } from 'sequelize';
-
 interface ConfigurableModuleValue {
   category: string;
   name: string;
@@ -31,9 +29,7 @@ const getAllModuleGuildConfigs = async (guildId: string) => {
   return response;
 };
 
-const getEditableItemsWithValues = async (guildId: string) => {
-  const values = await getAllModuleGuildConfigs(guildId);
-
+const getEditableItems = async () => {
   // This response is parsed quite a bit, as this function is primarily used for the web dashboard.
   // Structure is as follows:
   /*
@@ -42,7 +38,6 @@ const getEditableItemsWithValues = async (guildId: string) => {
         {
           name: string,
           type: string,
-          value: any,
           module: string,
           key: string
         }
@@ -54,17 +49,14 @@ const getEditableItemsWithValues = async (guildId: string) => {
   
   for (const moduleName in ConfigurableModules) {
     const module = ConfigurableModules[moduleName];
-    const moduleData = values[moduleName];
 
     for (const key in module.editableItems) {
       const item = module.editableItems[key];
-      const value = moduleData[key];
 
       if (!response[item.category]) response[item.category] = [];
       response[item.category].push({
         name: item.name,
         type: item.type,
-        value,
         module: moduleName,
         key
       });
@@ -74,10 +66,30 @@ const getEditableItemsWithValues = async (guildId: string) => {
   return response;
 };
 
+const updateMultipleConfigs = async (guildId: string, updates: { module: string, key: string, newValue: any }[]) => {
+  const moduleUpdates: any = {};
+
+  for (const update of updates) {
+    if (!moduleUpdates[update.module]) moduleUpdates[update.module] = [];
+    moduleUpdates[update.module].push({
+      key: update.key,
+      newValue: update.newValue
+    });
+  }
+
+  for (const moduleName in moduleUpdates) {
+    const module = ConfigurableModules[moduleName];
+    await module.set(guildId, moduleUpdates[moduleName]);
+  }
+
+  return true;
+};
+
 export default {
   registerConfigurableModule,
   getAllModuleGuildConfigs,
-  getEditableItemsWithValues,
+  getEditableItems,
+  updateMultipleConfigs,
   module: (moduleName: string) => {
     return ConfigurableModules[moduleName];
   }
