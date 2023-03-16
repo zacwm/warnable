@@ -103,6 +103,7 @@ function NavBox({ loading, server }: { loading: boolean, server?: { id: string, 
                 <NavLinkButton href={`/server/${server?.id}`} name="Main Page" />
                 <NavLinkButton href={`/server/${server?.id}/warnings`} name="All Warnings" />
                 <NavLinkButton href={`/server/${server?.id}/users`} name="Users" />
+                <NavLinkButton href={`/server/${server?.id}/Punishments`} name="Punishments" />
                 <NavLinkButton href={`/server/${server?.id}/config`} name="Config" />
               </React.Fragment>
             ) : (

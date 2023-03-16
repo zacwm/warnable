@@ -15,45 +15,18 @@ export default async function handler(req, res) {
     });
 
     if (!account) return res.status(401).json({ error: 'Unauthorized' });
+    const discordUserId = account.providerAccountId;
 
-    const accessToken = account.access_token;
-
-    const guildsRequest = await fetch('https://discord.com/api/users/@me/guilds', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    // Check status of request
-    if (guildsRequest.status !== 200) {
-      console.error('Failed to fetch guilds', guildsRequest.status, guildsRequest.statusText)
-      return res.status(500).json({ error: 'Failed to parse' });
-    }
-    const guilds = await guildsRequest.json();
-
-    const guildApiData = guilds.find((g) => {
-      const guildSelect = g.id === id;
-      const hasManageServer = g.permissions & 0x20;
-      return guildSelect && hasManageServer;
-    });
-    if (!guildApiData) return res.status(404).json({ error: 'Server not found' });
-
-    // TODO: Replace with proper server cache system
+    // Check with the guild that the user has manage server or above permissions
     const client = global.client;
-    let guild;
-
-    // Find in cache, otherwise try to fetch
-    if (client.guilds.cache.has(id)) {
-      guild = client.guilds.cache.get(id);
-    } else {
-      try {
-        guild = await client.guilds.fetch(id);
-      } catch (e) {
-        return res.status(404).json({ error: 'Server not found' });
-      }
-    }
-
+    const guild = await client.guilds.fetch(id);
     if (!guild) return res.status(404).json({ error: 'Server not found' });
+
+    const member = await guild.members.fetch(discordUserId);
+    if (!member) return res.status(401).json({ error: 'Unauthorized' });
+
+    const permissions = member.permissions;
+    if (!permissions.has('MANAGE_GUILD')) return res.status(401).json({ error: 'Unauthorized' });
 
     const modules = req.modules?.modules;
     if (!modules) return res.status(500).json({ error: 'Modules not found' });
