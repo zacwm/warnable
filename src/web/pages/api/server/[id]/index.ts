@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     const GuildConfig = ConfigerModule.getAllModuleGuildConfigs(id);
 
     const channels = await guild.channels.fetch();
+    const roles = await guild.roles.fetch();
 
     const parseTypeNumToString = (type: number) => {
       switch (type) {
@@ -56,7 +57,15 @@ export default async function handler(req, res) {
         id: c.id,
         name: c.name,
         type: parseTypeNumToString(c.type),
-      }))
+      })),
+      roles: roles.map((r) => ({
+        id: r.id,
+        name: r.name,
+        hex: r.hexColor,
+        hoist: r.hoist,
+        position: r.position,
+        permissions: r.permissions,
+      })).sort((a, b) => b.position - a.position),
     };
 
     return res.status(200).json(guildData);

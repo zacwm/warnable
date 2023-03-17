@@ -2,6 +2,7 @@ interface ConfigurableModuleValue {
   category: string;
   name: string;
   type: string;
+  flags?: string[];
 }
 
 interface ConfigurableModule {
@@ -39,7 +40,8 @@ const getEditableItems = async () => {
           name: string,
           type: string,
           module: string,
-          key: string
+          key: string,
+          flags: string[],
         }
       ],
       ...
@@ -58,7 +60,8 @@ const getEditableItems = async () => {
         name: item.name,
         type: item.type,
         module: moduleName,
-        key
+        key,
+        flags: item.flags || []
       });
     }
   }

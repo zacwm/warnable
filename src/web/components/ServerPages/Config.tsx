@@ -3,13 +3,14 @@ import * as React from 'react';
 import { useSetState } from '@mantine/hooks';
 import { Accordion, Stack, Text, Loader, Grid } from '@mantine/core';
 import ChannelInput from '../Inputs/ChannelInput';
+import RoleInput from '../Inputs/RoleInput';
 
 export default function ServerPageConfig({ server }) {
   const [loadingData, setLoadingData] = React.useState(false);
   const [dataError, setDataError] = React.useState(false);
   const [configData, setConfigData] = React.useState<any>({});
 
-  const [state, setState] = useSetState({ name: 'John', age: 35, job: 'Engineer' });
+  const [state, setState] = useSetState({});
 
   const fetchData = async () => {
     if (loadingData) return;
@@ -82,22 +83,46 @@ export default function ServerPageConfig({ server }) {
                             return (
                               <Grid.Col span={6}>
                                 <Text>{ item.name }</Text>
-                                <ChannelInput
-                                  channels={server.channels}
-                                  filter={item.type}
-                                  value={value}
-                                  onChange={value => {
-                                    setState(prev => {
-                                      return {
-                                        ...prev,
-                                        [key]: {
-                                          ...prev[key],
-                                          [item.key]: value
-                                        }
-                                      }
-                                    });
-                                  }}
-                                />
+                                {
+                                  ['textChannel', 'voiceChannel'].includes(item.type) ? (
+                                    <ChannelInput
+                                      channels={server.channels}
+                                      filter={item.type}
+                                      value={value}
+                                      multiple={item.flags?.includes('multiple')}
+                                      onChange={value => {
+                                        setState(prev => {
+                                          return {
+                                            ...prev,
+                                            [key]: {
+                                              ...prev[key],
+                                              [item.key]: value
+                                            }
+                                          }
+                                        });
+                                      }}
+                                    />
+                                  ) : item.type === 'role' ? (
+                                    <RoleInput
+                                      roles={server.roles}
+                                      value={value}
+                                      serverId={server.id}
+                                      excludeEveryone={item.flags?.includes('excludeEveryone')}
+                                      multiple={item.flags?.includes('multiple')}
+                                      onChange={value => {
+                                        setState(prev => {
+                                          return {
+                                            ...prev,
+                                            [key]: {
+                                              ...prev[key],
+                                              [item.key]: value
+                                            }
+                                          }
+                                        });
+                                      }}
+                                    />
+                                  ) : null
+                                }
                               </Grid.Col>
                             );
                           })
