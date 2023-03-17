@@ -69,6 +69,28 @@ export default function Servers() {
     <div>
       <Container size="sm" p="md">
         <Stack spacing="xl">
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+              borderRadius: 12,
+            })}
+            p="md"
+          >
+            <Text>
+              <Text
+                fz="lg"
+                weight={700}
+                variant="gradient"
+                gradient={{ from: '#cf4277', to: '#5e69e6', deg: 145 }}
+                span
+                sx={{ marginRight: '8px' }}
+              >
+                Hey, heads up!
+              </Text>
+              This web dashboard for warnable is still early in development. If you find any bugs, please check if it's been reported and if not open a new issue on <Link href="https://github.com/zacimac/warnable/issues">GitHub</Link>.
+            </Text>
+          </Box>
+
           <MenuNav
             username={session?.user?.name}
             avatar={session?.user?.image}
