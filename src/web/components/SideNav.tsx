@@ -53,6 +53,7 @@ function NavBox({ loading, server }: { loading: boolean, server?: { id: string, 
           sx={{
             height: '100%',
           }}
+          spacing={4}
         >
           <Stack>
             <Image
@@ -74,7 +75,7 @@ function NavBox({ loading, server }: { loading: boolean, server?: { id: string, 
                     backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
                   },
                 })}
-                onClick={() => router.push('/servers')}
+                onClick={() => router.push(`/server/${server?.id}`)}
               >
                 <Group>
                   <ServerIcon
@@ -100,8 +101,7 @@ function NavBox({ loading, server }: { loading: boolean, server?: { id: string, 
           <Stack sx={{ flex: 1 }} spacing={2}>
             { !loading ? (
               <React.Fragment>
-                <NavLinkButton href={`/server/${server?.id}`} name="Main Page" />
-                <NavLinkButton href={`/server/${server?.id}/warnings`} name="All Warnings" />
+                <NavLinkButton href={`/server/${server?.id}/warnings`} name="Warnings" />
                 <NavLinkButton href={`/server/${server?.id}/users`} name="Users" />
                 <NavLinkButton href={`/server/${server?.id}/Punishments`} name="Punishments" />
                 <NavLinkButton href={`/server/${server?.id}/config`} name="Config" />
