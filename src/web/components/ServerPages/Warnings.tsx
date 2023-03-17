@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
-import { Stack, Text, Paper, Loader, Table, Button } from '@mantine/core';
+import { Stack, Text, Paper, Loader, Table, Button, Pagination, Group } from '@mantine/core';
 import Mention from '../Mention';
 import TimeParser from '../TimeParser';
 
@@ -51,76 +51,93 @@ export default function ServerPageWarnings({ server }) {
             <Loader size="lg" />
           </Stack>
         ) : (
-          <Paper
-            p="md"
-            sx={(theme) => ({
-              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-              width: '100%',
-            })}
-            radius={12}
-          >
-            {
-              loadingError ? (
-                <Text>Failed to load warnings</Text>
-              ) : (
-                <React.Fragment>
-                  <Table>
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Points</th>
-                        <th>Issued By</th>
-                        <th>Reason</th>
-                        <th>Issued At</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        warnings.map(warning => (
-                          <tr key={warning.id}>
-                            <td>{warning.id}</td>
-                            <td>
-                              <Mention
-                                userTag={warning.userName}
-                                userId={warning.userId}
-                              />
-                            </td>
-                            <td>{warning.points}</td>
-                            <td>
-                              <Mention
-                                userTag={warning.issuerName}
-                                userId={warning.issuerId}
-                              />
-                            </td>
-                            <td>{warning.reason}</td>
-                            <td>
-                              <TimeParser unix={ warning.unixTimestamp } />
-                            </td>
-                            <td>
-                              <Button
-                                size="xs"
-                                radius={6}
-                                onClick={() => router.push(`/server/${server.id}/warning/${warning.id}`)}
-                              >
-                                View Warning
-                              </Button>
-                            </td>
-                          </tr>
-                        ))
-                      }
-                    </tbody>
-                  </Table>
-                  { warnings.length === 0 ? (
-                    <Stack align="center" p="xl">
-                      <Text>No warnings found</Text>
-                    </Stack>
-                  ) : null }
-                </React.Fragment>
-              )
-            }
-          </Paper>
+          <React.Fragment>
+
+            <Paper
+              p="md"
+              sx={(theme) => ({
+                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                width: '100%',
+                flex: 1
+              })}
+              radius={12}
+            >
+              {
+                loadingError ? (
+                  <Text>Failed to load warnings</Text>
+                ) : (
+                  <React.Fragment>
+                    <Table>
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>User</th>
+                          <th>Points</th>
+                          <th>Issued By</th>
+                          <th>Reason</th>
+                          <th>Issued At</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          warnings.map(warning => (
+                            <tr key={warning.id}>
+                              <td>{warning.id}</td>
+                              <td>
+                                <Mention
+                                  userTag={warning.userName}
+                                  userId={warning.userId}
+                                />
+                              </td>
+                              <td>{warning.points}</td>
+                              <td>
+                                <Mention
+                                  userTag={warning.issuerName}
+                                  userId={warning.issuerId}
+                                />
+                              </td>
+                              <td>{warning.reason}</td>
+                              <td>
+                                <TimeParser unix={ warning.unixTimestamp } />
+                              </td>
+                              <td>
+                                <Button
+                                  size="xs"
+                                  radius={6}
+                                  onClick={() => router.push(`/server/${server.id}/warning/${warning.id}`)}
+                                >
+                                  View Warning
+                                </Button>
+                              </td>
+                            </tr>
+                          ))
+                        }
+                      </tbody>
+                    </Table>
+                    { warnings.length === 0 ? (
+                      <Stack align="center" p="xl">
+                        <Text>No warnings found</Text>
+                      </Stack>
+                    ) : null }
+                  </React.Fragment>
+                )
+              }
+            </Paper>
+            <Group position="center">
+              <Pagination
+                total={10}
+                styles={{
+                  control: {
+                    borderRadius: 12,
+                    '&[data-active]': {
+                      backgroundColor: '#cf4277',
+                    },
+                  }
+                }}
+              />
+            </Group>
+          </React.Fragment>
         )
       }
     </Stack>

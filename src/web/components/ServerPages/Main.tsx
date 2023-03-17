@@ -1,9 +1,8 @@
-import { Stack, Text, Paper } from '@mantine/core';
+import { Stack, Text, Paper, Grid, Group } from '@mantine/core';
 
-export default function ServerPageMain() {
+const GridItem = ({ span, children }) => {
   return (
-    <Stack sx={{ height: '100%' }}>
-      <Text fz={30} fw="bold">Main</Text>
+    <Grid.Col span={span}>
       <Paper
         p="md"
         sx={(theme) => ({
@@ -12,8 +11,36 @@ export default function ServerPageMain() {
         })}
         radius={12}
       >
-
+        { children }
       </Paper>
+    </Grid.Col>
+  )
+}
+
+export default function ServerPageMain({ server }) {
+  return (
+    <Stack sx={{ height: '100%' }}>
+      <Text fz={30} fw="bold">{ server.name }</Text>
+      <Grid>
+        <GridItem span={4}>
+          <Group position="apart">
+            <Text fz={26}>Warnings</Text>
+            <Text fz={20}>3,756</Text>
+          </Group>
+        </GridItem>
+        <GridItem span={4}>
+          <Group position="apart">
+            <Text fz={26}>Last Warning</Text>
+            <Text fz={20}>3h ago</Text>
+          </Group>
+        </GridItem>
+        <GridItem span={4}>
+          <Group position="apart">
+            <Text fz={26}>Active Punishments</Text>
+            <Text fz={20}>12</Text>
+          </Group>
+        </GridItem>
+      </Grid>
     </Stack>
   )
 }
