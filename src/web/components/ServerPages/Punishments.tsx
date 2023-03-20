@@ -1,19 +1,414 @@
-import { Stack, Text, Paper } from '@mantine/core';
+import * as React from 'react';
 
-export default function ServerPagePunishments() {
+import { useSetState } from '@mantine/hooks';
+import { Stack, Text, Paper, Group, Badge, Button, Modal, NumberInput, Tabs, Box, Select, ActionIcon } from '@mantine/core';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
+
+function PunishmentModal({ opened, editingData, punishments, onDone, onClose }: { opened: boolean, editingData?: any, punishments: any[], onDone: (response: any) => void, onClose: () => void }) {
+  const [state, setState] = useSetState<any>({});
+  const [valueError, setValueError] = useSetState({
+    points: undefined,
+    actions: undefined,
+  });
+  const [maxValueTab, setMaxValueTab] = React.useState<string | null>('value');
+
+  // Check if an infinite punishment exists (but not if it's the one being edited)
+  const infiniteExists = punishments.some((punishment) => {
+    if (editingData && punishment === editingData.data) return false;
+    return punishment.maxPoints === null;
+  });
+
+  React.useEffect(() => {
+    // Set state to editingData if it exists.
+    if (editingData) {
+      setState(editingData.data);
+      setMaxValueTab(editingData.data.maxPoints === null ? 'infinite' : 'value');
+    } else {
+      setState({ minPoints: 0, maxPoints: 0, actions: [] });
+      setMaxValueTab('value');
+    }
+  }, [opened, editingData]);
+
+  React.useEffect(() => {
+    // Check if new state values are valid.
+    
+    // Check minPoints and maxPoints dont overlap with other punishments.
+    const minPointsOverlap = punishments.some((punishment) => {
+      if (editingData && punishment === editingData.data) return false;
+      return punishment.minPoints <= state.minPoints && punishment.maxPoints >= state.minPoints;
+    });
+    const maxPointsOverlap = punishments.some((punishment) => {
+      if (editingData && punishment === editingData.data) return false;
+      return punishment.minPoints <= state.maxPoints && punishment.maxPoints >= state.maxPoints;
+    });
+    const pointsOverlap = minPointsOverlap || maxPointsOverlap;
+    setValueError({ points: pointsOverlap ? 'Min and max points overlap with another punishment' : undefined });
+
+    // Check that minPoints is less than maxPoints.
+    if (maxValueTab == 'value' && state.minPoints > state.maxPoints) {
+      setValueError({ points: 'Min points cannot be greater than max points' });
+    }
+  }, [state]);
+
+  React.useEffect(() => {
+    // Check for maxPoints tab change and set state accordingly.
+    if (maxValueTab === 'infinite') {
+      setState({ maxPoints: null });
+    } else {
+      setState({ maxPoints: 0 });
+    }
+  }, [maxValueTab]);
+
+  const onDoneClick = () => {
+    // Check that all values are valid.
+    
+    // Check that minPoints exists
+    if (!state.minPoints) {
+      setValueError({ points: 'Min points is required' });
+      return;
+    }
+
+    // Check that no value errors exist.
+    if (Object.values(valueError).some((value) => value)) return;
+
+    // Send data to onDone.
+    onDone({
+      editingIndex: editingData?.index,
+      data: state,
+    });
+    onClose();
+  }
+
   return (
-    <Stack sx={{ height: '100%' }}>
-      <Text fz={30} fw="bold">Main</Text>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={editingData ? 'Edit Punishment' : 'Add Punishment'}
+      radius={12}
+    >
+      <Stack>
+        <Box
+          p="sm"
+          sx={
+            valueError.points ? {
+              border: '1px solid red',
+              borderRadius: 12,
+            } : {
+              border: '1px solid transparent',
+            }
+          }
+        >
+          <Text fw="bold">Min Points</Text>
+          <NumberInput
+            value={state?.minPoints}
+            min={0}
+            onChange={(value) => setState({ minPoints: value })}
+            my="sm"
+          />
+
+          <Text fw="bold">Max Points</Text>
+          <Tabs value={maxValueTab} onTabChange={setMaxValueTab}>
+            <Tabs.List grow>
+              <Tabs.Tab value="value">Value</Tabs.Tab>
+              <Tabs.Tab value="infinite" disabled={infiniteExists}>Infinite</Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="value">
+              <NumberInput
+                value={state?.maxPoints}
+                min={0}
+                onChange={(value) => setState({ maxPoints: value })}
+                mt="sm"
+              />
+            </Tabs.Panel>
+
+            <Tabs.Panel value="infinite">
+            </Tabs.Panel>
+          </Tabs>
+        </Box>
+        <Stack
+          p="sm"
+          sx={
+            valueError.actions ? {
+              border: '1px solid red',
+              borderRadius: 12,
+            } : {
+              border: '1px solid transparent',
+            }
+          }
+        >
+          <Group position="apart">
+            <Text fw="bold">Actions</Text>
+            <ActionIcon
+              onClick={() => {
+                const newActions = state.actions;
+                newActions.push({ type: undefined, value: undefined });
+                setState({ actions: newActions });
+              }}
+            >
+              <IconPlus />
+            </ActionIcon>
+          </Group>
+          {
+            state.actions?.map((action: any, index: number) => (
+              <Group>
+                <Stack spacing="sm">
+                  <Badge variant="filled" radius="xl" mr="sm">{index + 1}</Badge>
+                  <ActionIcon
+                    onClick={() => {
+                      const newActions = state.actions;
+                      newActions.splice(index, 1);
+                      setState({ actions: newActions });
+                    }}
+                  >
+                    <IconTrash />
+                  </ActionIcon>
+                </Stack>
+                <Stack sx={{ flex: 1 }}>
+                  <Select
+                    label="Action"
+                    value={action.type}
+                    placeholder="Select an action"
+                    onChange={(value) => {
+                      const newActions = state.actions;
+                      newActions[index].type = value;
+                      setState({ actions: newActions });
+                    }}
+                    data={[
+                      { label: 'Permanent Ban', value: 'ban' },
+                      { label: 'Soft/Temp Ban', value: 'softban' },
+                      { label: 'Kick', value: 'kick' },
+                      { label: 'Timeout', value: 'timeout' },
+                      { label: 'Role', value: 'role' },
+                      { label: 'Direct Message', value: 'directMessage' },
+                    ]}
+                  />
+                  {
+                    action.type === 'role' ? (
+                      <Text>TODO: Role Select Here</Text>
+                    ) : action.type === 'directMessage' ? (
+                      <Text>TODO: Direct Message Input Here</Text>
+                    ) : null
+                  }
+                </Stack>
+              </Group>
+            ))
+          }
+        </Stack>
+        <Button onClick={onDoneClick}>{ editingData ? "Save Changes" : "Add Punishment" }</Button>
+      </Stack>
+      {
+        // Check if any errors exist.
+        Object.values(valueError).some((value) => value) ? (
+          <Text color="red" mt="sm">
+            {
+              Object.values(valueError).filter((value) => value).map((value, index) => (
+                <React.Fragment key={index}>
+                  {value}
+                  {
+                    index !== Object.values(valueError).filter((value) => value).length - 1 ? (
+                      <br />
+                    ) : null
+                  }
+                </React.Fragment>
+              ))
+            }
+          </Text>
+        ) : null
+      }
+    </Modal>
+  )
+}
+
+function ActionItem({ action, index }: { action: any, index: number }) {
+  const secondsToReadable = (seconds: string) => {
+    const secondsIsNumber = !isNaN(parseInt(seconds));
+    if (!secondsIsNumber) return;
+
+    const intSeconds = parseInt(seconds);
+    const parsed_days = Math.floor(intSeconds / (3600 * 24));
+    const parsed_hours = Math.floor((intSeconds % (3600 * 24)) / 3600);
+    const parsed_minutes = Math.floor((intSeconds % 3600) / 60);
+    const parsed_seconds = Math.floor(intSeconds % 60);
+
+    const text_days = parsed_days > 0 ? `${parsed_days} day${parsed_days > 1 ? 's' : ''}` : '';
+    const text_hours = parsed_hours > 0 ? `${parsed_hours} hour${parsed_hours > 1 ? 's' : ''}` : '';
+    const text_minutes = parsed_minutes > 0 ? `${parsed_minutes} minute${parsed_minutes > 1 ? 's' : ''}` : '';
+    const text_seconds = parsed_seconds > 0 ? `${parsed_seconds} second${parsed_seconds > 1 ? 's' : ''}` : '';
+
+    const readableTime = [text_days, text_hours, text_minutes, text_seconds].filter(Boolean).join(', ');
+    return readableTime;
+  }
+
+  const actionTypeToReadable = (type: string, value?: string) => {
+    const readableTime = secondsToReadable(value);
+    if (type === 'ban') return 'Permantently ban the user from the server';
+    if (type === 'softban') return `Softban the user from the server for ${readableTime}`;
+    if (type === 'kick') return 'Kick the user from the server';
+    if (type === 'timeout') return `Timeout the user from the server for ${readableTime}`;
+    // TODO: Add a role parser component to parse the role id to the role name
+    if (type === 'role') return `Add the role ${value} to the user`;
+    if (type === 'directMessage') return `Direct message the user with the message "${value}"`;
+  }
+
+  return (
+    <Group>
+      <Text fz="lg">{index + 1}.</Text>
       <Paper
-        p="md"
+        p="sm"
         sx={(theme) => ({
-          backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-          width: '100%',
+          backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
+          flex: 1,
         })}
         radius={12}
       >
-
+        <Text>{actionTypeToReadable(action.type, action?.value)}</Text>
       </Paper>
+    </Group>
+  )
+}
+
+export default function ServerPagePunishments() {
+  const [state, setState] = useSetState({
+    items: [
+      {
+        minPoints: 3,
+        maxPoints: 5,
+        actions: [
+          {
+            type: 'directMessage',
+            value: 'You have been muted for 12 hours in *The Bathroom* for reaching 3-5 points'
+          },
+          {
+            type: 'timeout',
+            value: 12 * 60 * 60,
+          },
+        ]
+      },
+      {
+        minPoints: 6,
+        maxPoints: 10,
+        actions: [
+          {
+            type: 'directMessage',
+            value: 'You have been soft banned for 1 day from *The Bathroom* for reaching 6-10 points'
+          },
+          {
+            type: 'softban',
+            value: '1 day'
+          },
+        ]
+      },
+      {
+        minPoints: 11,
+        maxPoints: null,
+        actions: [
+          {
+            type: 'directMessage',
+            value: 'You have been banned from *The Bathroom* for reaching 11+ points'
+          },
+          {
+            type: 'ban',
+          },
+        ]
+      },
+    ]
+  });
+
+  const [punishmentModalOpen, setPunishmentModalOpen] = React.useState(false);
+  const [editPunishData, setEditPunishData] = React.useState(null);
+
+  return (
+    <Stack sx={{ height: '100%' }}>
+      <PunishmentModal
+        opened={punishmentModalOpen}
+        editingData={editPunishData}
+        punishments={state.items}
+        onDone={(response) => {
+          console.dir(response);
+          setEditPunishData(null);
+          const editingIndex = response.editingIndex;
+          if (editingIndex === null || editingIndex === undefined) {
+            const newState = [...state.items, response.data];
+            newState.sort((a, b) => a.minPoints - b.minPoints);
+            setState({
+              items: newState
+            });
+          } else {
+            const newItems = [...state.items];
+            newItems[editingIndex] = response.data;
+            newItems.sort((a, b) => a.minPoints - b.minPoints);
+            setState({
+              items: newItems
+            });
+          }
+        }}
+        onClose={() => {
+          setEditPunishData(null);
+          setPunishmentModalOpen(false);
+        }}
+      />
+      <Text fz={30} fw="bold">Punishments</Text>
+      {
+        state.items.map((item, index) => (
+          <Paper
+            p="md"
+            sx={(theme) => ({
+              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+              width: '100%',
+            })}
+            radius={12}
+          >
+            <Stack>
+              <Group position="apart">
+                {
+                  item.maxPoints === null ? (
+                    <Text fz="lg"><Text fw="bold" span>{item.minPoints}</Text> or <Text fw="bold" span>more</Text> points</Text>
+                  ) : item.minPoints == item.maxPoints ? (
+                    <Text fz="lg"><Text fw="bold" span>{item.minPoints}</Text> points</Text>
+                  ) : (
+                    <Text fz="lg">Between <Text fw="bold" span>{item.minPoints}</Text> to <Text fw="bold" span>{item.maxPoints}</Text> points</Text>
+                  )
+                }
+                <Group>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setEditPunishData({
+                        index,
+                        data: item,
+                      });
+                      setPunishmentModalOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setState({
+                        items: state.items.filter((_, i) => i !== index),
+                      });
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Group>
+              </Group>
+              <Stack>
+                {
+                  item.actions.map((action, index) => (
+                    <ActionItem action={action} index={index} />
+                  ))
+                }
+              </Stack>
+            </Stack>
+          </Paper>
+        ))
+      }
+      <Button size="lg" onClick={() => setPunishmentModalOpen(true)}>
+        Add Punishment
+      </Button>
     </Stack>
   )
 }

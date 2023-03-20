@@ -10,6 +10,7 @@ import ServerPageMain from '../../components/ServerPages/Main';
 import ServerPageWarnings from '../../components/ServerPages/Warnings';
 import ServerPageWarning from '../../components/ServerPages/Warning';
 import ServerPageUsers from '../../components/ServerPages/Users';
+import ServerPunishments from '../../components/ServerPages/Punishments';
 import ServerPageConfig from '../../components/ServerPages/Config';
 import ServerPageUnknown from '../../components/ServerPages/Unknown';
 
@@ -68,6 +69,9 @@ export default function Server() {
       break;
     case 'users': 
       PageComponent = ServerPageUsers;
+      break;
+    case 'punishments':
+      PageComponent = ServerPunishments;
       break;
     case 'config':
       PageComponent = ServerPageConfig;
