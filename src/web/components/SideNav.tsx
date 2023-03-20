@@ -36,16 +36,18 @@ function NavBox({ loading, server }: { loading: boolean, server?: { id: string, 
     <Box
       sx={{
         height: '100vh',
-        padding: 20,
-        boxSizing: 'border-box'
+        width: 380,
       }}
     >
       <Paper
         p="md"
         sx={(theme) => ({
+          top: 20,
+          left: 20,
           backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-          height: '100%',
+          height: 'calc(100% - 40px)',
           width: 350,
+          position: 'fixed'
         })}
         radius={12}
       >
@@ -103,7 +105,7 @@ function NavBox({ loading, server }: { loading: boolean, server?: { id: string, 
               <React.Fragment>
                 <NavLinkButton href={`/server/${server?.id}/warnings`} name="Warnings" />
                 <NavLinkButton href={`/server/${server?.id}/users`} name="Users" />
-                <NavLinkButton href={`/server/${server?.id}/Punishments`} name="Punishments" />
+                <NavLinkButton href={`/server/${server?.id}/punishments`} name="Punishments" />
                 <NavLinkButton href={`/server/${server?.id}/config`} name="Config" />
               </React.Fragment>
             ) : (
