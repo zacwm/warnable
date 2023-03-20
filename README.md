@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/logo.png" alt="Warnable Logo" style="max-width: 400px;">
+  <img src="./assets/logo.png" alt="Warnable Logo" style="max-width: 400px;" />
 </p>
 <p align="center">
   Version 3.0.0
@@ -8,6 +8,10 @@
   A point-based warning, moderation and logging Discord bot that's simple and quick to use.
 </p>
 <hr/>
+
+<p align="center">
+  <img src="./assets/cover.png" />
+</p>
 
 ## Table of Contents
 
