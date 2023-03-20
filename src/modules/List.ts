@@ -8,7 +8,15 @@ const CreateWarnListMessageContent: any = async (warnable: WarnableModule, userI
 
   const LastSeenName = await NameStorer.FetchLastSeenName(userId, true);
   const warnings = await WarnCore.FetchUserWarnings(userId, guildId);
+  console.dir(warnings);
   warnings.sort((a: any, b: any) => b.unixTimestamp - a.unixTimestamp);
+
+  if (warnings.length === 0) {
+    return {
+      embeds: [new EmbedBuilder().setTitle(`Warnings for ${LastSeenName ?? userId} [Total: 0]`).setDescription('No warnings found.')],
+      components: [],
+    }
+  }
   
   const totalWarningPoints = warnings.reduce((total: number, warning: any) => total + warning.points, 0);
   const totalPages = warnings.length > 0 ? Math.ceil(warnings.length / 5) : 1;
@@ -85,8 +93,12 @@ export default {
   [Events.InteractionCreate]: async (warnable: WarnableModule, interaction: Interaction) => {
     if (interaction.isChatInputCommand()) {
       if (!interaction.guild) return interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
+
+      // get user from command
+      const user = interaction.options.getUser('user');
+      if (!user) return interaction.reply({ content: 'No user provided.', ephemeral: true });
   
-      const WarnListMessageContent = await CreateWarnListMessageContent(warnable, interaction.user.id, interaction.guild.id, 1);
+      const WarnListMessageContent = await CreateWarnListMessageContent(warnable, user.id, interaction.guild.id, 1);
   
       interaction.reply(WarnListMessageContent);
     }

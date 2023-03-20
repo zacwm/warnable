@@ -44,7 +44,7 @@ const FetchUserWarnings = async (userId: string, guildId?: string, fillName?: bo
     return filledNameWarnings;
   }
 
-  return warnings.toJSON();
+  return warnings;
 };
 
 const FetchGuildWarnings = async (guildId: string, limit: number, fillName?: boolean, sortOldToNew?: boolean) => {
