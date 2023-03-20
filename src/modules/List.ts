@@ -8,7 +8,6 @@ const CreateWarnListMessageContent: any = async (warnable: WarnableModule, userI
 
   const LastSeenName = await NameStorer.FetchLastSeenName(userId, true);
   const warnings = await WarnCore.FetchUserWarnings(userId, guildId);
-  console.dir(warnings);
   warnings.sort((a: any, b: any) => b.unixTimestamp - a.unixTimestamp);
 
   if (warnings.length === 0) {
