@@ -4,7 +4,7 @@ import { useSetState } from '@mantine/hooks';
 import { Stack, Text, Paper, Group, Badge, Button, Modal, NumberInput, Tabs, Box, Select, ActionIcon } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 
-function PunishmentModal({ opened, editingData, punishments, onDone, onClose }: { opened: boolean, editingData?: any, punishments: any[], onDone: (response: any) => void, onClose: () => void }) {
+function PunishmentModal({ opened, editingData, actions, onDone, onClose }: { opened: boolean, editingData?: any, actions: any[], onDone: (response: any) => void, onClose: () => void }) {
   const [state, setState] = useSetState<any>({});
   const [valueError, setValueError] = useSetState({
     points: undefined,
@@ -13,7 +13,7 @@ function PunishmentModal({ opened, editingData, punishments, onDone, onClose }: 
   const [maxValueTab, setMaxValueTab] = React.useState<string | null>('value');
 
   // Check if an infinite punishment exists (but not if it's the one being edited)
-  const infiniteExists = punishments.some((punishment) => {
+  const infiniteExists = actions.some((punishment) => {
     if (editingData && punishment === editingData.data) return false;
     return punishment.maxPoints === null;
   });
@@ -33,11 +33,11 @@ function PunishmentModal({ opened, editingData, punishments, onDone, onClose }: 
     // Check if new state values are valid.
     
     // Check minPoints and maxPoints dont overlap with other punishments.
-    const minPointsOverlap = punishments.some((punishment) => {
+    const minPointsOverlap = actions.some((punishment) => {
       if (editingData && punishment === editingData.data) return false;
       return punishment.minPoints <= state.minPoints && punishment.maxPoints >= state.minPoints;
     });
-    const maxPointsOverlap = punishments.some((punishment) => {
+    const maxPointsOverlap = actions.some((punishment) => {
       if (editingData && punishment === editingData.data) return false;
       return punishment.minPoints <= state.maxPoints && punishment.maxPoints >= state.maxPoints;
     });
@@ -323,7 +323,7 @@ export default function ServerPagePunishments() {
       <PunishmentModal
         opened={punishmentModalOpen}
         editingData={editPunishData}
-        punishments={state.items}
+        actions={state.items}
         onDone={(response) => {
           console.dir(response);
           setEditPunishData(null);
@@ -348,7 +348,7 @@ export default function ServerPagePunishments() {
           setPunishmentModalOpen(false);
         }}
       />
-      <Text fz={30} fw="bold">Punishments</Text>
+      <Text fz={30} fw="bold">Actions</Text>
       {
         state.items.map((item, index) => (
           <Paper

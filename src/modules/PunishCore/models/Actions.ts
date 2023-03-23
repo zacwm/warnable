@@ -19,7 +19,6 @@ Actions.init({
   },
   maxPoints: {
     type: DataTypes.INTEGER,
-    allowNull: false,
   },
   actions: {
     type: DataTypes.STRING,
