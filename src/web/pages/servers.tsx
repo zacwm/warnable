@@ -50,6 +50,7 @@ export default function Servers() {
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [servers, setServers] = React.useState<any[]>([]);
+  const [serversFetchError, setServersFetchError] = React.useState<string | null>(null);
   const [clientId, setClientId] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -57,9 +58,12 @@ export default function Servers() {
       const res = await fetch('/api/servers');
       const data: any = await res.json();
 
+      setIsLoading(false);
+
+      if (!data?.servers || !data?.clientId) return setServersFetchError('Failed to fetch servers.');
+
       setServers(data.servers);
       setClientId(data.clientId);
-      setIsLoading(false);
     }
 
     fetchServers();
@@ -121,6 +125,14 @@ export default function Servers() {
                     })
                   }
                 </Stack>
+              ) : serversFetchError ? (
+                <Text align="center" p="sm" fz={20}>
+                  { serversFetchError }
+                </Text>
+              ) : servers.length == 0 ? (
+                <Text align="center" p="sm" fz={20}>
+                  You are not in any Discord servers...
+                </Text>
               ) : servers.map((server: any) => {
                 // Check if next server is not in server
                 const nextNotInServer = servers[servers.indexOf(server) + 1] ? server.inServer && !servers[servers.indexOf(server) + 1].inServer : false;

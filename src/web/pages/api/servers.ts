@@ -25,6 +25,8 @@ export default async function handler(req, res) {
       },
     });
 
+    if (userGuildsRequest.status !== 200) return res.status(500).json({ error: 'Failed to fetch user guilds' });
+
     const userGuildsResponse: any = await userGuildsRequest.json();
     const filtered = (userGuildsResponse || []).filter((server) => server.owner || server.permissions & 32);
 
