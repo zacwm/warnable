@@ -1,8 +1,105 @@
 import * as React from 'react';
 
 import { useSetState } from '@mantine/hooks';
-import { Stack, Text, Paper, Group, Badge, Button, Modal, NumberInput, Tabs, Box, Select, ActionIcon } from '@mantine/core';
+import { Stack, Text, Paper, Group, Badge, Button, Modal, NumberInput, Tabs, Box, Select, ActionIcon, Textarea } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
+
+const actionTypes = [
+  {
+    type: 'ban',
+    label: 'Ban',
+    values: [
+      {
+        type: 'length',
+        label: 'Length',
+        required: false,
+        valueType: ['seconds'],
+      }
+    ],
+  },
+  {
+    type: 'kick',
+    label: 'Kick',
+  },
+  {
+    type: 'timeout',
+    label: 'Timeout/Mute',
+    values: [
+      {
+        type: 'length',
+        label: 'Length',
+        required: true,
+        valueType: 'seconds',
+      }
+    ],
+  },
+  {
+    type: 'role',
+    label: 'Role',
+    values: [
+      {
+        type: 'role',
+        label: 'Role',
+        required: true,
+        valueType: 'role',
+      },
+      {
+        type: 'length',
+        label: 'Length',
+        required: true,
+        valueType: 'seconds',
+      },
+    ],
+  },
+  {
+    type: 'directMessage',
+    label: 'Direct Message',
+    values: [
+      {
+        type: 'message',
+        label: 'Message',
+        required: true,
+        valueType: 'multiline',
+      },
+    ],
+  }
+];
+
+function ModalActionItemValues({ type, values, onChange }: { type: string, values: any[], onChange: (value: any) => void }) {
+  const actionType = actionTypes.find((action) => action.type === type);
+  if (!actionType) return null;
+
+  return (
+    <Stack spacing="xs">
+      {
+        actionType.values ? actionType.values.map((value, index) => (
+          <Box key={index}>
+            {
+              value.valueType == 'seconds' ? (
+                <NumberInput
+                  label={value.label}
+                  value={values?.[index]}
+                  min={0}
+                  onChange={(value) => onChange({ [index]: value })}
+                />
+              ) : value.valueType == 'multiline' ? (
+                <Textarea
+                  label={value.label}
+                  value={values?.[index]}
+                  onChange={(event) => onChange({ [index]: event.currentTarget.value })}
+                />
+              ) : value.valueType == 'role' ? (
+                <Text>TODO: Role picker</Text>
+              ) : (
+                <Text>Unknown value type '{value.valueType}'</Text>
+              )
+            }
+          </Box>
+        )) : null
+      }
+    </Stack>
+  );
+}
 
 function PunishmentModal({ opened, editingData, actions, onDone, onClose }: { opened: boolean, editingData?: any, actions: any[], onDone: (response: any) => void, onClose: () => void }) {
   const [state, setState] = useSetState<any>({});
@@ -151,47 +248,59 @@ function PunishmentModal({ opened, editingData, actions, onDone, onClose }: { op
           </Group>
           {
             state.actions?.map((action: any, index: number) => (
-              <Group>
-                <Stack spacing="sm">
-                  <Badge variant="filled" radius="xl" mr="sm">{index + 1}</Badge>
-                  <ActionIcon
-                    onClick={() => {
-                      const newActions = state.actions;
-                      newActions.splice(index, 1);
-                      setState({ actions: newActions });
-                    }}
-                  >
-                    <IconTrash />
-                  </ActionIcon>
-                </Stack>
-                <Stack sx={{ flex: 1 }}>
-                  <Select
-                    label="Action"
-                    value={action.type}
-                    placeholder="Select an action"
-                    onChange={(value) => {
-                      const newActions = state.actions;
-                      newActions[index].type = value;
-                      setState({ actions: newActions });
-                    }}
-                    data={[
-                      { label: 'Permanent Ban', value: 'ban' },
-                      { label: 'Soft/Temp Ban', value: 'softban' },
-                      { label: 'Kick', value: 'kick' },
-                      { label: 'Timeout', value: 'timeout' },
-                      { label: 'Role', value: 'role' },
-                      { label: 'Direct Message', value: 'directMessage' },
-                    ]}
-                  />
-                  {
-                    action.type === 'role' ? (
-                      <Text>TODO: Role Select Here</Text>
-                    ) : action.type === 'directMessage' ? (
-                      <Text>TODO: Direct Message Input Here</Text>
-                    ) : null
-                  }
-                </Stack>
-              </Group>
+              <Box
+                sx={(theme) => ({
+                  backgroundColor: theme.colors.dark[5],
+                  borderRadius: 12,
+                })}
+                p="xs"
+              >
+                <Group>
+                  <Stack spacing="sm">
+                    <Badge variant="filled" radius="xl" mr="sm">{index + 1}</Badge>
+                    <ActionIcon
+                      onClick={() => {
+                        const newActions = state.actions;
+                        newActions.splice(index, 1);
+                        setState({ actions: newActions });
+                      }}
+                    >
+                      <IconTrash />
+                    </ActionIcon>
+                  </Stack>
+                  <Stack sx={{ flex: 1 }} spacing="xs">
+                    <Select
+                      label="Action"
+                      value={action.type}
+                      placeholder="Select an action"
+                      onChange={(value) => {
+                        const newActions = state.actions;
+                        newActions[index].type = value;
+                        setState({ actions: newActions });
+                      }}
+                      data={
+                        actionTypes.map((actionType) => ({
+                          value: actionType.type,
+                          label: actionType.label,
+                        }))
+                      }
+                    />
+                    {
+                      action.type ? (
+                        <ModalActionItemValues
+                          type={action.type}
+                          values={action.values}
+                          onChange={(value) => {
+                            const newActions = state.actions;
+                            newActions[index].values = value;
+                            setState({ actions: newActions });
+                          }}
+                        />
+                      ) : null
+                    }
+                  </Stack>
+                </Group>
+              </Box>
             ))
           }
         </Stack>
@@ -223,7 +332,7 @@ function PunishmentModal({ opened, editingData, actions, onDone, onClose }: { op
 function ActionItem({ action, index }: { action: any, index: number }) {
   const secondsToReadable = (seconds: string) => {
     const secondsIsNumber = !isNaN(parseInt(seconds));
-    if (!secondsIsNumber) return;
+    if (!secondsIsNumber) return 'Invalid Time';
 
     const intSeconds = parseInt(seconds);
     const parsed_days = Math.floor(intSeconds / (3600 * 24));
@@ -240,17 +349,6 @@ function ActionItem({ action, index }: { action: any, index: number }) {
     return readableTime;
   }
 
-  const actionTypeToReadable = (type: string, value?: string) => {
-    const readableTime = secondsToReadable(value);
-    if (type === 'ban') return 'Permantently ban the user from the server';
-    if (type === 'softban') return `Softban the user from the server for ${readableTime}`;
-    if (type === 'kick') return 'Kick the user from the server';
-    if (type === 'timeout') return `Timeout the user from the server for ${readableTime}`;
-    // TODO: Add a role parser component to parse the role id to the role name
-    if (type === 'role') return `Add the role ${value} to the user`;
-    if (type === 'directMessage') return `Direct message the user with the message "${value}"`;
-  }
-
   return (
     <Group>
       <Text fz="lg">{index + 1}.</Text>
@@ -262,7 +360,32 @@ function ActionItem({ action, index }: { action: any, index: number }) {
         })}
         radius={12}
       >
-        <Text>{actionTypeToReadable(action.type, action?.value)}</Text>
+        <Stack spacing="xs">
+          {
+            action.type === 'ban' && !action?.values?.[0] ? (
+              <Text>Permantently ban the user from the server</Text>
+            ) : action.type === 'ban' && action?.values?.[0] ? (
+              <Text>Ban the user from the server for {secondsToReadable(action.values?.[0])}</Text>
+            ) : action.type === 'kick' ? (
+              <Text>Kick the user from the server</Text>
+            ) : action.type === 'timeout' ? (
+              <Text>Timeout the user from the server for {secondsToReadable(action.values?.[0])}</Text>
+            ) : action.type === 'role' ? (
+              <Text>Give the user the role {action.values?.[0]}</Text>
+            ) : action.type === 'directMessage' ? (
+              <React.Fragment>
+                <Text>Direct message the user:</Text>
+                <Text
+                  sx={(theme) => ({
+                    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[0],
+                    borderRadius: 12,
+                  })}
+                  p="xs"
+                >{action?.values?.[0] || 'unknown'}</Text>
+              </React.Fragment>
+            ) : null
+          }
+        </Stack>
       </Paper>
     </Group>
   )
@@ -277,11 +400,11 @@ export default function ServerPagePunishments() {
         actions: [
           {
             type: 'directMessage',
-            value: 'You have been muted for 12 hours in *The Bathroom* for reaching 3-5 points'
+            values: ['You have been muted for 12 hours in *The Bathroom* for reaching 3-5 points']
           },
           {
             type: 'timeout',
-            value: 12 * 60 * 60,
+            values: [12 * 60 * 60],
           },
         ]
       },
@@ -291,11 +414,11 @@ export default function ServerPagePunishments() {
         actions: [
           {
             type: 'directMessage',
-            value: 'You have been soft banned for 1 day from *The Bathroom* for reaching 6-10 points'
+            values: ['You have been soft banned for 1 day from *The Bathroom* for reaching 6-10 points']
           },
           {
-            type: 'softban',
-            value: '1 day'
+            type: 'ban',
+            values: [1 * 24 * 60 * 60]
           },
         ]
       },
@@ -305,7 +428,7 @@ export default function ServerPagePunishments() {
         actions: [
           {
             type: 'directMessage',
-            value: 'You have been banned from *The Bathroom* for reaching 11+ points'
+            values: ['You have been banned from *The Bathroom* for reaching 11+ points']
           },
           {
             type: 'ban',
@@ -317,6 +440,7 @@ export default function ServerPagePunishments() {
 
   const [punishmentModalOpen, setPunishmentModalOpen] = React.useState(false);
   const [editPunishData, setEditPunishData] = React.useState(null);
+  const [changesMade, setChangesMade] = React.useState(false);
 
   return (
     <Stack sx={{ height: '100%' }}>
@@ -325,7 +449,6 @@ export default function ServerPagePunishments() {
         editingData={editPunishData}
         actions={state.items}
         onDone={(response) => {
-          console.dir(response);
           setEditPunishData(null);
           const editingIndex = response.editingIndex;
           if (editingIndex === null || editingIndex === undefined) {
@@ -342,13 +465,19 @@ export default function ServerPagePunishments() {
               items: newItems
             });
           }
+          setChangesMade(true);
         }}
         onClose={() => {
           setEditPunishData(null);
           setPunishmentModalOpen(false);
         }}
       />
-      <Text fz={30} fw="bold">Actions</Text>
+      <Group position="apart">
+        <Text fz={30} fw="bold">Actions</Text>
+        <ActionIcon onClick={() => setPunishmentModalOpen(true)}>
+          <IconPlus />
+        </ActionIcon>
+      </Group>
       {
         state.items.map((item, index) => (
           <Paper
@@ -389,6 +518,7 @@ export default function ServerPagePunishments() {
                       setState({
                         items: state.items.filter((_, i) => i !== index),
                       });
+                      setChangesMade(true);
                     }}
                   >
                     Delete
@@ -406,9 +536,17 @@ export default function ServerPagePunishments() {
           </Paper>
         ))
       }
-      <Button size="lg" onClick={() => setPunishmentModalOpen(true)}>
-        Add Punishment
-      </Button>
+      {
+        changesMade ? (
+          <Button
+            size="lg"
+            mt="md"
+            onClick={() => setPunishmentModalOpen(true)}
+          >
+            Save Actions
+          </Button>
+        ) : null
+      }
     </Stack>
   )
 }
