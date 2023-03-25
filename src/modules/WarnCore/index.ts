@@ -39,12 +39,14 @@ const FetchUserWarnings = async (userId: string, guildId?: string, fillName?: bo
     order: [ ['id', sortOldToNew ? 'DESC' : 'ASC'] ],
   });
 
+  if (warnings.length === 0) return [];
+
   if (fillName) {
     const filledNameWarnings = await fillNames(warnings);
     return filledNameWarnings;
   }
 
-  return warnings;
+  return warnings.toJSON();
 };
 
 const FetchGuildWarnings = async (guildId: string, limit: number, fillName?: boolean, sortOldToNew?: boolean) => {
@@ -53,6 +55,8 @@ const FetchGuildWarnings = async (guildId: string, limit: number, fillName?: boo
     limit,
     order: [ ['id', sortOldToNew ? 'ASC' : 'DESC'] ],
   });
+
+  if (warnings.length === 0) return [];
 
   if (fillName) {
     const filledNameWarnings = await fillNames(warnings);
