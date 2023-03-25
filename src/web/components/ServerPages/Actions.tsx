@@ -391,56 +391,46 @@ function ActionItem({ action, index }: { action: any, index: number }) {
   )
 }
 
-export default function ServerPagePunishments() {
-  const [state, setState] = useSetState({
-    items: [
-      {
-        minPoints: 3,
-        maxPoints: 5,
-        actions: [
-          {
-            type: 'directMessage',
-            values: ['You have been muted for 12 hours in *The Bathroom* for reaching 3-5 points']
-          },
-          {
-            type: 'timeout',
-            values: [12 * 60 * 60],
-          },
-        ]
-      },
-      {
-        minPoints: 6,
-        maxPoints: 10,
-        actions: [
-          {
-            type: 'directMessage',
-            values: ['You have been soft banned for 1 day from *The Bathroom* for reaching 6-10 points']
-          },
-          {
-            type: 'ban',
-            values: [1 * 24 * 60 * 60]
-          },
-        ]
-      },
-      {
-        minPoints: 11,
-        maxPoints: null,
-        actions: [
-          {
-            type: 'directMessage',
-            values: ['You have been banned from *The Bathroom* for reaching 11+ points']
-          },
-          {
-            type: 'ban',
-          },
-        ]
-      },
-    ]
-  });
+export default function ServerPagePunishments({ server }) {
+  const [state, setState] = useSetState({ items: [] });
 
   const [punishmentModalOpen, setPunishmentModalOpen] = React.useState(false);
   const [editPunishData, setEditPunishData] = React.useState(null);
   const [changesMade, setChangesMade] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch(`/api/server/${server.id}/actions`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        setState({ items: data.actions });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  const saveActions = () => {
+    // Make POST request to save actions
+    fetch(`/api/server/${server.id}/actions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(state.items)
+    })
+      .then((response) => {
+        if (response.ok) {
+          setChangesMade(false);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   return (
     <Stack sx={{ height: '100%' }}>
@@ -541,7 +531,7 @@ export default function ServerPagePunishments() {
           <Button
             size="lg"
             mt="md"
-            onClick={() => setPunishmentModalOpen(true)}
+            onClick={saveActions}
           >
             Save Actions
           </Button>
