@@ -13,15 +13,9 @@ Actions.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
-  minPoints: {
-    type: DataTypes.INTEGER,
+  data: {
+    type: DataTypes.JSON,
     allowNull: false,
-  },
-  maxPoints: {
-    type: DataTypes.INTEGER,
-  },
-  actions: {
-    type: DataTypes.STRING,
   }
 }, {
   sequelize,
