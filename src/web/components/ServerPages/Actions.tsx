@@ -406,7 +406,7 @@ export default function ServerPagePunishments({ server }) {
         }
       })
       .then((data) => {
-        setState({ items: data.actions });
+        setState({ items: data.ranges });
       })
       .catch((error) => {
         console.error(error);

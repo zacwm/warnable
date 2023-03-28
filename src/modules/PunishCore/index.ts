@@ -10,7 +10,7 @@ export interface PunishmentAction {
   values?: any[];
 }
 
-const GetGuildActions = async (guildId: string) => {
+const GetGuildRanges = async (guildId: string, ) => {
   const GuildActions = await ActionsModel.findOne({ where: { guildId } });
 
   if (!GuildActions?.data) return [];
@@ -110,7 +110,7 @@ export default {
     });
   },
 
-  GetGuildActions,
+  GetGuildRanges,
   SetGuildActions,
   ApplyPunishmentActions,
   RunPoints: async (guildId: string, userId: string, points: number) => {

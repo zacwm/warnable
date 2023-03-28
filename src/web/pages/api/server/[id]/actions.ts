@@ -30,11 +30,11 @@ export default async function handler(req, res) {
 
     // Requesting for actions
     else if (req.method === 'GET') {
-      const actions = await PunishCoreModule.GetGuildActions(id);
-      if (!actions) return res.status(500).json({ error: 'Guild actions error' });
+      const ranges = await PunishCoreModule.GetGuildRanges(id);
+      if (!ranges) return res.status(500).json({ error: 'Guild actions error' });
 
       return res.status(200).json({
-        actions,
+        ranges,
       });
     }
   }
