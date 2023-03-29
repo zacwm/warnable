@@ -93,6 +93,10 @@ const CreateNewWarning = async (guildId: string, userId: string, issuerId: strin
 
   const totalPoints = await WarningModel.sum('points', { where: { userId, guildId } });
 
+  // Do PunishCore points check to see if the actions should be taken.
+  const PunishCore = warnable.modules.PunishCore.main;
+  PunishCore.CheckPoints(guildId, userId, totalPoints);
+
   return {
     ...warning.toJSON(),
     totalPoints,
