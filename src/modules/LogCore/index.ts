@@ -38,7 +38,7 @@ export default {
 
         return config.toJSON();
       },
-      set: async (guildId: string, updates: { key: string, value: any }[]) => {
+      set: async (guildId: string, updates: { key: string, newValue: any }[]) => {
         let config = await ConfigModel.findOne({ where: { guildId } });
 
         if (!config) {
@@ -46,9 +46,10 @@ export default {
         }
 
         for (const update of updates) {
-          config[update.key] = update.value;
+          config[update.key] = update.newValue;
         }
 
+        console.dir('saving config');
         await config.save();
         return config.toJSON();
       },

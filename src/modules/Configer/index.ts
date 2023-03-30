@@ -80,8 +80,13 @@ const updateMultipleConfigs = async (guildId: string, updates: { module: string,
     });
   }
 
+  console.dir('performing updates');
+  console.dir(moduleUpdates, { depth: null });
+
   for (const moduleName in moduleUpdates) {
     const module = ConfigurableModules[moduleName];
+    console.dir('performing updates for module: ' + moduleName);
+    console.dir(moduleUpdates[moduleName], { depth: null });
     await module.set(guildId, moduleUpdates[moduleName]);
   }
 
